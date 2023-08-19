@@ -6,7 +6,6 @@ static QString styleSheet = R"(
     <style>
         body {
             background-color: %5;
-            font-family: monospace;
         }
 
         .TreeMoveNumber {
@@ -17,7 +16,6 @@ static QString styleSheet = R"(
         .TreeBody {
             font-size: %8px;
             line-height: 140%;
-            font-family: monospace;
         }
 
         .Annotation {

@@ -146,11 +146,9 @@ void BoardWidget::drawBorder(QPainter& context) {
     context.drawLine(BottomLeft, TopLeft);
 
     QBrush Brush = QBrush(Qt::white);
-    QFont Font("Monospace", 10, QFont::Bold);
 
     context.setBrush(Brush);
     context.setPen(m_settings.get("colorBorderText").value<QColor>());
-    context.setFont(Font);
 
     for (int i = 0; i < 8; i++) {
         int j = absolute(i);
