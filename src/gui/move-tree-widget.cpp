@@ -1,6 +1,7 @@
 #include "gui/move-tree-widget.hpp"
 #include "util/html-move-tree-builder.hpp"
 #include "settings/settings-factory.hpp"
+#include <QWebEnginePage>
 #include <QMenu>
 #include <QContextMenuEvent>
 #include <QInputDialog>
@@ -49,18 +50,17 @@ QString TreeHtml::html(const Tree* tree)
 
 
 MoveTreeWidget::MoveTreeWidget(QWidget* parent)
-    : QWebView(parent)
+    : QWebEngineView(parent)
     , m_tree(nullptr)
     , m_hoveredMoveUid(0)
     , m_actionMoveUid(0)
 {
-    page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
-
     QObject::connect(&SettingsFactory::html(), &HtmlSettings::changed,
                      this, &MoveTreeWidget::redraw);
 
-    QObject::connect(this, &QWebView::linkClicked, this, &MoveTreeWidget::onMoveClicked);
-    QObject::connect(page(), &QWebPage::linkHovered, this, &MoveTreeWidget::onMoveHovered);
+    QObject::connect(page(), &QWebEnginePage::linkHovered, this, &MoveTreeWidget::onMoveHovered);
+    // TODO: implement this
+    //QObject::connect(this, &QWebView::linkClicked, this, &MoveTreeWidget::onMoveClicked);
 
     new QShortcut(QKeySequence(Qt::Key_Left), this, SLOT(onMovePrev()));
     new QShortcut(QKeySequence(Qt::Key_Right), this, SLOT(onMoveNext()));

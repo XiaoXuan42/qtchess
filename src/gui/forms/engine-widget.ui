@@ -83,8 +83,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>380</width>
-        <height>230</height>
+        <width>374</width>
+        <height>208</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -101,13 +101,7 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="QWebView" name="engineOutput">
-         <property name="url">
-          <url>
-           <string>about:blank</string>
-          </url>
-         </property>
-        </widget>
+        <widget class="QWebEngineView" name="engineOutput" native="true"/>
        </item>
       </layout>
      </widget>
@@ -117,9 +111,10 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QWebView</class>
+   <class>QWebEngineView</class>
    <extends>QWidget</extends>
-   <header>QtWebKitWidgets/QWebView</header>
+   <header>QWebEngineView</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>

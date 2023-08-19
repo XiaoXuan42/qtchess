@@ -200,12 +200,12 @@ QString Board::toFen() const
 
 QString Board::fileString(int file) const
 {
-    return QString(file + 'a');
+    return QString(char(file + 'a'));
 }
 
 QString Board::rankString(int rank) const
 {
-    return QString(7 - rank + '1');
+    return QString(char(7 - rank + '1'));
 }
 
 int Board::charToRank(QChar rank) const
