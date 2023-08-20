@@ -29,17 +29,17 @@ Piece::Piece(Piece::Type type, Player owner) : mType(type), mOwner(owner) {}
 
 QString Piece::symbolString() const {
     switch (mType) {
-        case Piece::Pawn:
+        case Piece::Type::Pawn:
             return "P";
-        case Piece::Knight:
+        case Piece::Type::Knight:
             return "N";
-        case Piece::Bishop:
+        case Piece::Type::Bishop:
             return "B";
-        case Piece::Rook:
+        case Piece::Type::Rook:
             return "R";
-        case Piece::Queen:
+        case Piece::Type::Queen:
             return "Q";
-        case Piece::King:
+        case Piece::Type::King:
             return "K";
         default:
             return "";

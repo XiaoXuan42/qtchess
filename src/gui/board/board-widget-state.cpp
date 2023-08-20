@@ -9,7 +9,8 @@ BoardWidgetState* BoardWidgetStateDragging::onMouseRelease(BoardWidget* Board,
 
     if (Event->button() != Qt::LeftButton) return nullptr;
 
-    if (Board->isFieldAt(Event->x(), Event->y(), &Field.x, &Field.y)) {
+    if (Board->isFieldAt(Event->position().x(), Event->position().y(), &Field.x,
+                         &Field.y)) {
         Move move(Board->m_draggedField, Field);
 
         if (Board->m_board.isLegal(move, NULL, NULL))
@@ -26,8 +27,8 @@ BoardWidgetState* BoardWidgetStateDragging::onMouseRelease(BoardWidget* Board,
 
 BoardWidgetState* BoardWidgetStateDragging::onMouseMove(BoardWidget* Board,
                                                         QMouseEvent* Event) {
-    Board->m_dragOffset.x = Event->x() - Board->m_dragStart.x;
-    Board->m_dragOffset.y = Event->y() - Board->m_dragStart.y;
+    Board->m_dragOffset.x = Event->position().x() - Board->m_dragStart.x;
+    Board->m_dragOffset.y = Event->position().y() - Board->m_dragStart.y;
     Board->redraw();
 
     return nullptr;
@@ -37,7 +38,8 @@ BoardWidgetState* BoardWidgetStateNormal::onMousePress(BoardWidget* Board,
                                                        QMouseEvent* Event) {
     Coord2D<int> Field;
 
-    if (Board->isFieldAt(Event->x(), Event->y(), &Field.x, &Field.y)) {
+    if (Board->isFieldAt(Event->position().x(), Event->position().y(), &Field.x,
+                         &Field.y)) {
         if (Board->m_selectedField == Coord2D<int>(-1, -1))
             Board->m_selectedField = Field;
         else if (Board->m_selectedField != Field) {
@@ -51,7 +53,8 @@ BoardWidgetState* BoardWidgetStateNormal::onMousePress(BoardWidget* Board,
 
         Board->m_draggedField = Field;
         Board->m_dragOffset = Coord2D<int>(0, 0);
-        Board->m_dragStart = Coord2D<int>(Event->x(), Event->y());
+        Board->m_dragStart =
+            Coord2D<int>(Event->position().x(), Event->position().y());
         Board->redraw();
         return new BoardWidgetStateDragging();
     }

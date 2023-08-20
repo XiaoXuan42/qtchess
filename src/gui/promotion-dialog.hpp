@@ -18,19 +18,19 @@ public:
     Piece::Type selectedPieceType() const { return mSelectedPieceType; }
 private slots:
     void selectedQueen() {
-        mSelectedPieceType = Piece::Queen;
+        mSelectedPieceType = Piece::Type::Queen;
         emit done(0);
     }
     void selectedRook() {
-        mSelectedPieceType = Piece::Rook;
+        mSelectedPieceType = Piece::Type::Rook;
         emit done(0);
     }
     void selectedBishop() {
-        mSelectedPieceType = Piece::Bishop;
+        mSelectedPieceType = Piece::Type::Bishop;
         emit done(0);
     }
     void selectedKnight() {
-        mSelectedPieceType = Piece::Knight;
+        mSelectedPieceType = Piece::Type::Knight;
         emit done(0);
     }
 

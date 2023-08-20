@@ -2,12 +2,11 @@
 #define PIECES_HPP
 #include <QString>
 
-#include "common.hpp"
 #include "game/player.hpp"
 
 class Piece {
 public:
-    enum Type {
+    enum class Type {
         None = -1,
         Pawn = 0,
         Knight = 1,
@@ -28,25 +27,25 @@ public:
                    Player owner = Player::none());
 
     /*! \brief checks whether this is a none-piece */
-    inline bool isNone() const { return mType == None; }
+    inline bool isNone() const { return mType == Type::None; }
 
     /*! \brief checks whether piece is a pawn */
-    inline bool isPawn() const { return mType == Pawn; }
+    inline bool isPawn() const { return mType == Type::Pawn; }
 
     /*! \brief checks whether piece is a knight */
-    inline bool isKnight() const { return mType == Knight; }
+    inline bool isKnight() const { return mType == Type::Knight; }
 
     /*! \brief checks whether piece is a bishop */
-    inline bool isBishop() const { return mType == Bishop; }
+    inline bool isBishop() const { return mType == Type::Bishop; }
 
     /*! \brief checks whether piece is a rook */
-    inline bool isRook() const { return mType == Rook; }
+    inline bool isRook() const { return mType == Type::Rook; }
 
     /*! \brief checks whether piece is a queen */
-    inline bool isQueen() const { return mType == Queen; }
+    inline bool isQueen() const { return mType == Type::Queen; }
 
     /*! \brief checks whether piece is a king */
-    inline bool isKing() const { return mType == King; }
+    inline bool isKing() const { return mType == Type::King; }
 
     /*! \brief returns piece owner */
     inline Player owner() const { return mOwner; }

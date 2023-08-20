@@ -9,7 +9,6 @@ namespace Ui {
 class MainWindow;
 }
 
-class TreeNode;
 class MainWindow : public QMainWindow {
     Q_OBJECT
 public:

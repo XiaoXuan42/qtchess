@@ -18,7 +18,7 @@ class BoardWidget : public QWidget {
 
     Q_OBJECT
 public:
-    explicit BoardWidget(QWidget* parent = 0,
+    explicit BoardWidget(QWidget* parent = nullptr,
                          BoardSettings& settings = SettingsFactory::board());
 
     void setBoard(Board board);

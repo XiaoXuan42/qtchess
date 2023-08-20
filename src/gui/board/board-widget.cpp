@@ -15,9 +15,7 @@ BoardWidget::BoardWidget(QWidget* parent, BoardSettings& settings)
       m_state(new BoardWidgetStateNormal()),
       m_pieceSet(nullptr),
       m_flipped(false),
-      m_draggedField(-1, -1)
-
-      ,
+      m_draggedField(-1, -1),
       m_selectedField(-1, -1) {
     setMinimumSize(MinSize, MinSize);
     setMouseTracking(true);

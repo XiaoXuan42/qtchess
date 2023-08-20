@@ -13,7 +13,7 @@ struct Move {
 
     Move() {}
     Move(Coord2D<int> From, Coord2D<int> To,
-         Piece::Type PromotionTo = Piece::None)
+         Piece::Type PromotionTo = Piece::Type::None)
         : From(From), To(To), PromotionPiece(PromotionTo) {}
 
     bool operator==(const Move& Move) const {

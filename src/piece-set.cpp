@@ -8,9 +8,9 @@
 
 static const QString PieceAssetsPathPrefix = "assets/pieces";
 static const QString PieceName[] = {
-    [Piece::Pawn] = "pawn",     [Piece::Knight] = "knight",
-    [Piece::Bishop] = "bishop", [Piece::Rook] = "rook",
-    [Piece::King] = "king",     [Piece::Queen] = "queen"};
+    [int(Piece::Type::Pawn)] = "pawn",     [int(Piece::Type::Knight)] = "knight",
+    [int(Piece::Type::Bishop)] = "bishop", [int(Piece::Type::Rook)] = "rook",
+    [int(Piece::Type::King)] = "king",     [int(Piece::Type::Queen)] = "queen"};
 
 static QSvgRenderer* MakeSvgRenderer(std::pair<Piece::Type, Player> Kind,
                                      QString Style) {
@@ -21,7 +21,7 @@ static QSvgRenderer* MakeSvgRenderer(std::pair<Piece::Type, Player> Kind,
     else
         Path += "black_";
 
-    Path += PieceName[Kind.first];
+    Path += PieceName[int(Kind.first)];
     Path += ".svg";
 
     return new QSvgRenderer(Path);

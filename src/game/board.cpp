@@ -286,14 +286,14 @@ Move Board::longAlgebraicNotationToMove(const QString& lan) const {
         QChar piece = lan.at(4);
 
         if (piece == 'b')
-            move.PromotionPiece = Piece::Bishop;
+            move.PromotionPiece = Piece::Type::Bishop;
         else if (piece == 'r')
-            move.PromotionPiece = Piece::Rook;
+            move.PromotionPiece = Piece::Type::Rook;
         else if (piece == 'q')
-            move.PromotionPiece = Piece::Queen;
+            move.PromotionPiece = Piece::Type::Queen;
         else
             // Default promotion is funny.
-            move.PromotionPiece = Piece::Knight;
+            move.PromotionPiece = Piece::Type::Knight;
     }
 
     return move;
@@ -423,22 +423,22 @@ bool Board::isLegal(Move move, GameState* retState, MoveType* retType) const {
     Coord2D<int> enPassantCoords = {-1, -1};
 
     switch (pieceAt(move.From).type()) {
-        case Piece::Pawn:
+        case Piece::Type::Pawn:
             legal = isLegalPawnMove(move, type, enPassantCoords);
             break;
-        case Piece::Knight:
+        case Piece::Type::Knight:
             legal = isLegalKnightMove(move);
             break;
-        case Piece::Bishop:
+        case Piece::Type::Bishop:
             legal = isLegalBishopMove(move);
             break;
-        case Piece::Rook:
+        case Piece::Type::Rook:
             legal = isLegalRookMove(move);
             break;
-        case Piece::Queen:
+        case Piece::Type::Queen:
             legal = isLegalQueenMove(move);
             break;
-        case Piece::King:
+        case Piece::Type::King:
             legal = isLegalKingMove(move, moveIsCastle, type);
             break;
         default:
@@ -628,17 +628,17 @@ CoordsVector Board::getAttackedCoords(Piece piece, Player owner,
     int y = position.y;
 
     switch (piece.type()) {
-        case Piece::Pawn:
+        case Piece::Type::Pawn:
             return getPawnAttack(x, y, owner);
-        case Piece::Knight:
+        case Piece::Type::Knight:
             return getKnightAttack(x, y);
-        case Piece::Bishop:
+        case Piece::Type::Bishop:
             return getBishopAttack(x, y);
-        case Piece::Rook:
+        case Piece::Type::Rook:
             return getRookAttack(x, y);
-        case Piece::Queen:
+        case Piece::Type::Queen:
             return getQueenAttack(x, y);
-        case Piece::King:
+        case Piece::Type::King:
             return getKingAttack(x, y);
         default:
             return {};
@@ -660,22 +660,22 @@ CoordsVector Board::getBishopAttack(int x, int y) const {
 
     for (int p = x + 1, q = y + 1; isLegalCoord(p, q); p++, q++) {
         LegalMoves.push_back({p, q});
-        if (pieceAt(p, q).type() != Piece::None) break;
+        if (pieceAt(p, q).type() != Piece::Type::None) break;
     }
 
     for (int p = x - 1, q = y - 1; isLegalCoord(p, q); p--, q--) {
         LegalMoves.push_back({p, q});
-        if (pieceAt(p, q).type() != Piece::None) break;
+        if (pieceAt(p, q).type() != Piece::Type::None) break;
     }
 
     for (int p = x + 1, q = y - 1; isLegalCoord(p, q); p++, q--) {
         LegalMoves.push_back({p, q});
-        if (pieceAt(p, q).type() != Piece::None) break;
+        if (pieceAt(p, q).type() != Piece::Type::None) break;
     }
 
     for (int p = x - 1, q = y + 1; isLegalCoord(p, q); p--, q++) {
         LegalMoves.push_back({p, q});
-        if (pieceAt(p, q).type() != Piece::None) break;
+        if (pieceAt(p, q).type() != Piece::Type::None) break;
     }
 
     return LegalMoves;
@@ -696,22 +696,22 @@ CoordsVector Board::getRookAttack(int x, int y) const {
 
     for (int i = x + 1; isLegalCoord(i, y); i++) {
         LegalMoves.push_back({i, y});
-        if (pieceAt(i, y).type() != Piece::None) break;
+        if (pieceAt(i, y).type() != Piece::Type::None) break;
     }
 
     for (int i = x - 1; isLegalCoord(i, y); i--) {
         LegalMoves.push_back({i, y});
-        if (pieceAt(i, y).type() != Piece::None) break;
+        if (pieceAt(i, y).type() != Piece::Type::None) break;
     }
 
     for (int i = y + 1; isLegalCoord(x, i); i++) {
         LegalMoves.push_back({x, i});
-        if (pieceAt(x, i).type() != Piece::None) break;
+        if (pieceAt(x, i).type() != Piece::Type::None) break;
     }
 
     for (int i = y - 1; isLegalCoord(x, i); i--) {
         LegalMoves.push_back({x, i});
-        if (pieceAt(x, i).type() != Piece::None) break;
+        if (pieceAt(x, i).type() != Piece::Type::None) break;
     }
     return LegalMoves;
 }
