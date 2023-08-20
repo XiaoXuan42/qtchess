@@ -1,14 +1,16 @@
 #ifndef GAME_TREE_HPP
 #define GAME_TREE_HPP
-#include <QObject>
 #include <QMap>
+#include <QObject>
+
 #include "game/board.hpp"
 
 /*! \brief Internal node structure representation */
 class Tree;
 class TreeNode {
     friend class Tree;
-public:
+
+   public:
     ~TreeNode();
 
     TreeNode(const Board& board = Board(), TreeNode* parent = nullptr,
@@ -20,7 +22,8 @@ public:
     /*! \brief Returns next node in the mainline */
     const TreeNode* next() const;
 
-    /*! \brief Returns pointer to the neighbour to which there is transition through given move */
+    /*! \brief Returns pointer to the neighbour to which there is transition
+     * through given move */
     const TreeNode* next(Move move) const;
 
     /*! \brief Returns parent node */
@@ -50,7 +53,8 @@ public:
     /*! \brief Returns unique id of the node */
     size_t uid() const;
 
-    /*! \brief Constructs node from unique id. If uid is invalid the behaviour is undefined. */
+    /*! \brief Constructs node from unique id. If uid is invalid the behaviour
+     * is undefined. */
     static TreeNode* fromUid(size_t uid);
 
     /*! \brief Sets main line */
@@ -73,7 +77,8 @@ public:
 
     /*! \brief Sets annotation */
     void setAnnotation(const QString& annotation);
-private:
+
+   private:
     /*! \brief Sets current board */
     void setBoard(const Board& board);
 
@@ -83,7 +88,8 @@ private:
     TreeNode* next(Move move);
     TreeNode* parent();
     TreeNode* parentLine();
-private:
+
+   private:
     /*!< chess-board snapshot */
     Board m_board;
     /*!< main line in this line */
@@ -98,10 +104,9 @@ private:
     QString m_annotation;
 };
 
-class Tree : public QObject
-{
+class Tree : public QObject {
     Q_OBJECT
-public:
+   public:
     /*! \brief Constructs an empty tree */
     Tree();
 
@@ -143,10 +148,11 @@ public:
 
     /*! \brief Annotates given node */
     void annotate(TreeNode* node, const QString& annotation);
-signals:
+   signals:
     /*! \brief Emited when tree is changed */
     void changed();
-private:
+
+   private:
     /*! \brief Root node */
     TreeNode m_root;
     /*! \brief Currently active node */

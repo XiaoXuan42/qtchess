@@ -1,8 +1,8 @@
-#include "gui/main-window.hpp"
 #include <QApplication>
 
-int main(int argc, char *argv[])
-{
+#include "gui/main-window.hpp"
+
+int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
     MainWindow w(nullptr);
     w.show();

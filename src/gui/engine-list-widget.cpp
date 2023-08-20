@@ -1,37 +1,29 @@
 #include "gui/engine-list-widget.hpp"
-#include "settings/settings-factory.hpp"
+
 #include <QDebug>
 
+#include "settings/settings-factory.hpp"
+
 EngineListWidget::EngineListWidget(QWidget* parent)
-    : QListWidget(parent)
-    , m_currentId(-1)
-{
-    QObject::connect(this, SIGNAL(clicked(QModelIndex)), this, SLOT(onClicked(QModelIndex)));
-    QObject::connect(&SettingsFactory::engines(), &AbstractSettings::changed, this, &EngineListWidget::update);
+    : QListWidget(parent), m_currentId(-1) {
+    QObject::connect(this, SIGNAL(clicked(QModelIndex)), this,
+                     SLOT(onClicked(QModelIndex)));
+    QObject::connect(&SettingsFactory::engines(), &AbstractSettings::changed,
+                     this, &EngineListWidget::update);
     update();
 }
 
-QString EngineListWidget::engineName() const
-{
-    return m_engines[m_currentId];
-}
+QString EngineListWidget::engineName() const { return m_engines[m_currentId]; }
 
-bool EngineListWidget::selected() const
-{
-    return m_currentId != -1;
-}
+bool EngineListWidget::selected() const { return m_currentId != -1; }
 
-void EngineListWidget::update()
-{
+void EngineListWidget::update() {
     m_engines = SettingsFactory::engines().names();
     m_currentId = -1;
     clear();
     addItems(m_engines);
 }
 
-void EngineListWidget::onClicked(QModelIndex index)
-{
+void EngineListWidget::onClicked(QModelIndex index) {
     m_currentId = index.row();
 }
-
-

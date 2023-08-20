@@ -2,16 +2,15 @@
 #define ENGINE_HPP
 #include <QProcess>
 #include <QVector>
-#include "engine/variant-info.hpp"
-#include "engine/engine-option.hpp"
-#include "engine/engine-config.hpp"
 
+#include "engine/engine-config.hpp"
+#include "engine/engine-option.hpp"
+#include "engine/variant-info.hpp"
 
 class Board;
-class Engine : public QObject
-{
+class Engine : public QObject {
     Q_OBJECT
-public:
+   public:
     enum State { Working, Stopping, Idling, Initializing };
 
     explicit Engine(const EngineConfig& config, const int timeoutMs = 2000);
@@ -40,13 +39,14 @@ public:
 
     /*! \brief Returns parsed options. */
     const QList<EngineOption>& options();
-signals:
+   signals:
     void variantParsed(VariantInfo);
     void optionsParsed(QList<EngineOption>);
-private slots:
+   private slots:
     void onStarted();
     void onReadyRead();
-private:
+
+   private:
     /*! \brief Waits for state change to a specific one or throws. */
     void waitForStateOrThrow(State expectedState);
 
@@ -78,4 +78,4 @@ private:
     QList<EngineOption> m_parsedOptions;
 };
 
-#endif // ENGINE_HPP
+#endif  // ENGINE_HPP

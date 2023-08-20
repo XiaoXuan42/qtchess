@@ -1,14 +1,15 @@
 #ifndef ABSTRACT_SETTINGS_HPP
 #define ABSTRACT_SETTINGS_HPP
-#include <QVariant>
 #include <QSettings>
+#include <QVariant>
 
 class AbstractSettings : public QObject {
     Q_OBJECT
-public:
+   public:
     AbstractSettings(const QString& logicalGroup, const QString& subGroup = "");
 
-    /*! \brief Gets value when the key exists either in memory or in file, otherwise throws assertion. */
+    /*! \brief Gets value when the key exists either in memory or in file,
+     * otherwise throws assertion. */
     virtual QVariant get(const QString& key) const;
 
     /*! \brief Lists all keys in this logical settings group. */
@@ -23,15 +24,17 @@ public:
     /*! \brief Removes key and its children. */
     virtual void unset(const QString& key);
 
-    /*! \brief Resets all memory saved keys to their default values from file. */
+    /*! \brief Resets all memory saved keys to their default values from file.
+     */
     virtual void reset();
 
     /*! \brief Saves all keys to file. */
     virtual void save();
-signals:
+   signals:
     /*! \brief Emited whenever setValue() or reset() is called. */
     void changed();
-private:
+
+   private:
     QSettings m_settings;
     QVariantMap m_values;
 };

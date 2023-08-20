@@ -1,30 +1,27 @@
 #include "engine.hpp"
-#include "game/board.hpp"
+
 #include <QDebug>
 #include <stdexcept>
 
+#include "game/board.hpp"
 
 Engine::Engine(const EngineConfig& config, const int timeoutMs)
-    : m_timeoutMs(timeoutMs)
-    , m_process(new QProcess())
-    , m_state(Engine::Initializing)
-    , m_config(config)
-{
+    : m_timeoutMs(timeoutMs),
+      m_process(new QProcess()),
+      m_state(Engine::Initializing),
+      m_config(config) {
     QObject::connect(m_process, &QProcess::started, this, &Engine::onStarted);
-    QObject::connect(m_process, &QProcess::readyRead, this, &Engine::onReadyRead);
+    QObject::connect(m_process, &QProcess::readyRead, this,
+                     &Engine::onReadyRead);
     m_process->setProgram(m_config.command());
 }
 
-Engine::~Engine()
-{
-    if (isAnalysing())
-        stopAnalysis();
+Engine::~Engine() {
+    if (isAnalysing()) stopAnalysis();
 }
 
-void Engine::start()
-{
-    if (started())
-        return;
+void Engine::start() {
+    if (started()) return;
 
     // Start the engine.
     m_process->start();
@@ -35,13 +32,10 @@ void Engine::start()
     waitForStateOrThrow(Engine::Idling);
 }
 
-void Engine::startAnalysis(const Board& current)
-{
-    if (isAnalysing())
-        return;
+void Engine::startAnalysis(const Board& current) {
+    if (isAnalysing()) return;
 
-    if (!started())
-        start();
+    if (!started()) start();
     waitForStateOrThrow(Engine::Idling);
 
     setState(Engine::Working);
@@ -53,48 +47,29 @@ void Engine::startAnalysis(const Board& current)
     send("go infinite");
 }
 
-void Engine::stopAnalysis()
-{
-    if (!isAnalysing())
-        return;
+void Engine::stopAnalysis() {
+    if (!isAnalysing()) return;
     setState(Engine::Stopping);
     send("stop");
 
     waitForStateOrThrow(Engine::Idling);
 }
 
-void Engine::setOption(const QString& name, const QString& value)
-{
+void Engine::setOption(const QString& name, const QString& value) {
     send(QString("setoption name %1 value %2").arg(name, value));
 }
 
-bool Engine::isAnalysing() const
-{
-    return m_state == Engine::Working;
-}
+bool Engine::isAnalysing() const { return m_state == Engine::Working; }
 
-bool Engine::started() const
-{
-    return m_process->state() == QProcess::Running;
-}
+bool Engine::started() const { return m_process->state() == QProcess::Running; }
 
-EngineConfig Engine::config()
-{
-    return m_config;
-}
+EngineConfig Engine::config() { return m_config; }
 
-const QList<EngineOption>& Engine::options()
-{
-    return m_parsedOptions;
-}
+const QList<EngineOption>& Engine::options() { return m_parsedOptions; }
 
-void Engine::onStarted()
-{
-    send("uci");
-}
+void Engine::onStarted() { send("uci"); }
 
-void Engine::onReadyRead()
-{
+void Engine::onReadyRead() {
     while (m_process->canReadLine()) {
         QString line = m_process->readLine();
         // Make Windows users happy.
@@ -107,21 +82,17 @@ void Engine::onReadyRead()
     }
 }
 
-void Engine::waitForStateOrThrow(State expectedState)
-{
+void Engine::waitForStateOrThrow(State expectedState) {
     while (m_state != expectedState) {
         if (!m_process->waitForReadyRead(m_timeoutMs))
             throw std::runtime_error("Engine stopped responding.");
     }
 }
 
-void Engine::parseOption(const QString& line)
-{
-    static QStringList keywords = {
-        "option", "name", "type", "check",
-        "spin", "combo", "button", "string",
-        "default", "min", "max", "var"
-    };
+void Engine::parseOption(const QString& line) {
+    static QStringList keywords = {"option",  "name",  "type",   "check",
+                                   "spin",    "combo", "button", "string",
+                                   "default", "min",   "max",    "var"};
 
     QStringList tokens = line.split(" ");
     QString name;
@@ -164,7 +135,8 @@ void Engine::parseOption(const QString& line)
                     else if (tokens[i] == "max")
                         maxValue = tokens[++i].toInt();
                 }
-                option = EngineOption::spinbox(name, minValue, maxValue, defaultValue);
+                option = EngineOption::spinbox(name, minValue, maxValue,
+                                               defaultValue);
             } else {
                 qDebug() << "Warning: ignored option: " << line;
                 break;
@@ -174,8 +146,7 @@ void Engine::parseOption(const QString& line)
     }
 }
 
-void Engine::parseInfo(const QString& line)
-{
+void Engine::parseInfo(const QString& line) {
     // It is variant info
     if (line.contains("score")) {
         QStringList tokens = line.split(" ");
@@ -197,8 +168,7 @@ void Engine::parseInfo(const QString& line)
                 info.setId(tokens[++i].toInt());
             } else if (token == "pv") {
                 ++i;
-                while (i < tokens.size())
-                    moves.append(tokens[i++]);
+                while (i < tokens.size()) moves.append(tokens[i++]);
 
                 info.setMoveList(moves);
             } else if (token == "nps") {
@@ -212,47 +182,36 @@ void Engine::parseInfo(const QString& line)
     }
 }
 
-Engine::State Engine::parseLine(const QString& line)
-{
+Engine::State Engine::parseLine(const QString& line) {
     Q_ASSERT(m_state != Engine::Idling && "Engine talks while it is idle.");
 
     switch (m_state) {
-    case Engine::Initializing:
-        // End of the initialization, engine is now idle
-        if (line.startsWith("uciok")) {
-            emit optionsParsed(m_parsedOptions);
-            return Engine::Idling;
-        } else if (line.startsWith("option"))
-            parseOption(line);
-        break;
-    case Engine::Working:
-        if (line.startsWith("info"))
-            parseInfo(line);
-        break;
-    case Engine::Stopping:
-        if (line.startsWith("bestmove"))
-            return Engine::Idling;
-        break;
-    default:
-        break;
+        case Engine::Initializing:
+            // End of the initialization, engine is now idle
+            if (line.startsWith("uciok")) {
+                emit optionsParsed(m_parsedOptions);
+                return Engine::Idling;
+            } else if (line.startsWith("option"))
+                parseOption(line);
+            break;
+        case Engine::Working:
+            if (line.startsWith("info")) parseInfo(line);
+            break;
+        case Engine::Stopping:
+            if (line.startsWith("bestmove")) return Engine::Idling;
+            break;
+        default:
+            break;
     }
     // No state change
     return m_state;
 }
 
-void Engine::setState(State state)
-{
-    m_state = state;
-}
+void Engine::setState(State state) { m_state = state; }
 
-void Engine::send(const QString& command)
-{
+void Engine::send(const QString& command) {
     m_process->write(command.toStdString().c_str());
     m_process->write("\n");
 }
 
-QString Engine::readLine() const
-{
-    return QString(m_process->readLine());
-}
-
+QString Engine::readLine() const { return QString(m_process->readLine()); }

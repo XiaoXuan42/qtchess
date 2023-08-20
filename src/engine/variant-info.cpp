@@ -1,71 +1,30 @@
 #include "engine/variant-info.hpp"
 
 VariantInfo::VariantInfo()
-    : m_id(1)
-    , m_score(0)
-    , m_depth(0)
-    , m_mate(0)
-    , m_nps(0)
-{
-}
+    : m_id(1), m_score(0), m_depth(0), m_mate(0), m_nps(0) {}
 
-void VariantInfo::setMoveList(const QStringList& moveList)
-{
+void VariantInfo::setMoveList(const QStringList& moveList) {
     m_moveList = moveList;
 }
 
-void VariantInfo::setId(const int id)
-{
-    m_id = id;
-}
+void VariantInfo::setId(const int id) { m_id = id; }
 
-void VariantInfo::setMate(const int moves)
-{
-    m_mate = moves;
-}
+void VariantInfo::setMate(const int moves) { m_mate = moves; }
 
-void VariantInfo::setDepth(const int depth)
-{
-    m_depth = depth;
-}
+void VariantInfo::setDepth(const int depth) { m_depth = depth; }
 
-void VariantInfo::setScore(const int score)
-{
-    m_score = score;
-}
+void VariantInfo::setScore(const int score) { m_score = score; }
 
-void VariantInfo::setNps(const int nodesPerSecond)
-{
-    m_nps = nodesPerSecond;
-}
+void VariantInfo::setNps(const int nodesPerSecond) { m_nps = nodesPerSecond; }
 
-const QStringList& VariantInfo::moveList() const
-{
-    return m_moveList;
-}
+const QStringList& VariantInfo::moveList() const { return m_moveList; }
 
-int VariantInfo::id() const
-{
-    return m_id;
-}
+int VariantInfo::id() const { return m_id; }
 
-int VariantInfo::depth() const
-{
-    return m_depth;
-}
+int VariantInfo::depth() const { return m_depth; }
 
-int VariantInfo::nps() const
-{
-    return m_nps;
-}
+int VariantInfo::nps() const { return m_nps; }
 
-int VariantInfo::score() const
-{
-    return m_score;
-}
+int VariantInfo::score() const { return m_score; }
 
-int VariantInfo::mate() const
-{
-    return m_mate;
-}
-
+int VariantInfo::mate() const { return m_mate; }

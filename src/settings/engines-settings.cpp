@@ -1,15 +1,13 @@
 #include "settings/engines-settings.hpp"
+
 #include "engine/engine-config.hpp"
 
-EnginesSettings::EnginesSettings()
-    : AbstractSettings("engines")
-{
+EnginesSettings::EnginesSettings() : AbstractSettings("engines") {
     set("configs", QList<QVariant>());
     reset();
 }
 
-QStringList EnginesSettings::names() const
-{
+QStringList EnginesSettings::names() const {
     QStringList list;
 
     for (const QVariant& current : get("configs").toList())
@@ -18,8 +16,7 @@ QStringList EnginesSettings::names() const
     return list;
 }
 
-void EnginesSettings::saveConfig(const EngineConfig& config)
-{
+void EnginesSettings::saveConfig(const EngineConfig& config) {
     QList<QVariant> configs = get("configs").toList();
     bool added = false;
 
@@ -33,15 +30,13 @@ void EnginesSettings::saveConfig(const EngineConfig& config)
             break;
         }
     }
-    if (!added)
-        configs.append(config.toVariantMap());
+    if (!added) configs.append(config.toVariantMap());
 
     set("configs", configs);
     save();
 }
 
-void EnginesSettings::remove(const QString& name)
-{
+void EnginesSettings::remove(const QString& name) {
     QList<QVariant> configs = get("configs").toList();
 
     for (int i = 0; i < configs.size(); i++) {
@@ -56,13 +51,11 @@ void EnginesSettings::remove(const QString& name)
     save();
 }
 
-EngineConfig EnginesSettings::config(const QString& name) const
-{
+EngineConfig EnginesSettings::config(const QString& name) const {
     for (const QVariant& variant : get("configs").toList()) {
         EngineConfig current(variant.toMap());
 
-        if (current.name() == name)
-            return current;
+        if (current.name() == name) return current;
     }
     Q_ASSERT(!"No such engine exists.");
 }

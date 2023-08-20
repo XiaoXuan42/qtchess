@@ -1,25 +1,27 @@
 #include "engine-edit-dialog.hpp"
-#include "ui_engine-edit-dialog.h"
+
+#include <QCheckBox>
 #include <QDebug>
 #include <QLineEdit>
-#include <QSpinBox>
-#include <QCheckBox>
 #include <QMessageBox>
+#include <QSpinBox>
 
-#include "engine/engine-config.hpp"
 #include "engine-edit-options-dialog.hpp"
+#include "engine/engine-config.hpp"
+#include "ui_engine-edit-dialog.h"
 
 EngineEditDialog::EngineEditDialog(EngineConfig config, QWidget* parent)
-    : QDialog(parent)
-    , ui(new Ui::EngineEditDialog)
-    , m_config(config)
-    , m_registeredEngines(SettingsFactory::engines().names())
-{
+    : QDialog(parent),
+      ui(new Ui::EngineEditDialog),
+      m_config(config),
+      m_registeredEngines(SettingsFactory::engines().names()) {
     ui->setupUi(this);
 
     QObject::connect(ui->ok, SIGNAL(clicked(bool)), this, SLOT(onOkClicked()));
-    QObject::connect(ui->cancel, SIGNAL(clicked(bool)), this, SLOT(onCancelClicked()));
-    QObject::connect(ui->configure, SIGNAL(clicked(bool)), this, SLOT(onConfigureClicked()));
+    QObject::connect(ui->cancel, SIGNAL(clicked(bool)), this,
+                     SLOT(onCancelClicked()));
+    QObject::connect(ui->configure, SIGNAL(clicked(bool)), this,
+                     SLOT(onConfigureClicked()));
 
     ui->name->setText(config.name());
     ui->command->setText(config.command());
@@ -29,44 +31,34 @@ EngineEditDialog::EngineEditDialog(EngineConfig config, QWidget* parent)
     m_registeredEngines.removeOne(config.name());
 }
 
-EngineEditDialog::~EngineEditDialog()
-{
-    delete ui;
+EngineEditDialog::~EngineEditDialog() { delete ui; }
+
+EngineConfig EngineEditDialog::engineConfig() const { return m_config; }
+
+void EngineEditDialog::onOkClicked() {
+    if (settingsValid()) emit accept();
 }
 
-EngineConfig EngineEditDialog::engineConfig() const
-{
-    return m_config;
-}
+void EngineEditDialog::onCancelClicked() { emit reject(); }
 
-void EngineEditDialog::onOkClicked()
-{
-    if (settingsValid())
-        emit accept();
-}
-
-void EngineEditDialog::onCancelClicked()
-{
-    emit reject();
-}
-
-void EngineEditDialog::onConfigureClicked()
-{
+void EngineEditDialog::onConfigureClicked() {
     if (settingsValid()) {
-        QScopedPointer<EngineEditOptionsDialog> dialog(new EngineEditOptionsDialog(m_config, this));
+        QScopedPointer<EngineEditOptionsDialog> dialog(
+            new EngineEditOptionsDialog(m_config, this));
 
         if (dialog->exec() == QDialog::Accepted)
             m_config = dialog->engineConfig();
     }
 }
 
-bool EngineEditDialog::settingsValid()
-{
+bool EngineEditDialog::settingsValid() {
     // Already registered. Cannot create such an engine.
     if (m_registeredEngines.contains(ui->name->text()))
-        QMessageBox::warning(this, tr("Engine duplication"), tr("Engine with such name already exists."));
+        QMessageBox::warning(this, tr("Engine duplication"),
+                             tr("Engine with such name already exists."));
     else if (ui->name->text().isEmpty()) {
-        QMessageBox::warning(this, tr("Engine name empty"), tr("Engine must have a name."));
+        QMessageBox::warning(this, tr("Engine name empty"),
+                             tr("Engine must have a name."));
     } else {
         m_config.setName(ui->name->text());
         m_config.setCommand(ui->command->text());
@@ -80,10 +72,10 @@ bool EngineEditDialog::settingsValid()
             return true;
         } catch (std::runtime_error& error) {
             // It didn't start :-(
-            QMessageBox::critical(this, tr("Engine executable error"), tr(error.what()));
+            QMessageBox::critical(this, tr("Engine executable error"),
+                                  tr(error.what()));
         }
     }
 
     return false;
 }
-

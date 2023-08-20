@@ -1,8 +1,9 @@
 #ifndef MAIN_WINDOW_HPP
 #define MAIN_WINDOW_HPP
-#include "gui/settings/settings-dialog.hpp"
-#include "game/tree.hpp"
 #include <QMainWindow>
+
+#include "game/tree.hpp"
+#include "gui/settings/settings-dialog.hpp"
 
 namespace Ui {
 class MainWindow;
@@ -11,10 +12,10 @@ class MainWindow;
 class TreeNode;
 class MainWindow : public QMainWindow {
     Q_OBJECT
-public:
+   public:
     explicit MainWindow(QWidget *parent);
     ~MainWindow();
-private slots:
+   private slots:
     void onMoveMade(Move move);
     void onSettingsShow();
     void onEnginesShow();
@@ -24,13 +25,13 @@ private slots:
     void onPositionSet(size_t);
     void onSetFen();
     void closeEvent(QCloseEvent *);
-private:
+
+   private:
     Ui::MainWindow *ui;
     // Game tree
     Tree m_tree;
     // Settings dialog
-    SettingsDialog* m_settingsDialog;
-
+    SettingsDialog *m_settingsDialog;
 };
 
-#endif // MAIN_WINDOW_HPP
+#endif  // MAIN_WINDOW_HPP

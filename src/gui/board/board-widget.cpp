@@ -1,29 +1,32 @@
 #include "gui/board/board-widget.hpp"
-#include "gui/board/board-widget-state.hpp"
-#include "game/board.hpp"
-#include "piece-set.hpp"
-#include <algorithm>
+
 #include <QPainter>
+#include <algorithm>
+
+#include "game/board.hpp"
+#include "gui/board/board-widget-state.hpp"
+#include "piece-set.hpp"
 
 static const int MinSize = 256;
 
 BoardWidget::BoardWidget(QWidget* parent, BoardSettings& settings)
-    : QWidget(parent)
-    , m_settings(settings)
-    , m_state(new BoardWidgetStateNormal())
-    , m_pieceSet(nullptr)
-    , m_flipped(false)
-    , m_draggedField(-1, -1)
-    , m_selectedField(-1, -1)
-{
+    : QWidget(parent),
+      m_settings(settings),
+      m_state(new BoardWidgetStateNormal()),
+      m_pieceSet(nullptr),
+      m_flipped(false),
+      m_draggedField(-1, -1)
+
+      ,
+      m_selectedField(-1, -1) {
     setMinimumSize(MinSize, MinSize);
     setMouseTracking(true);
 
-    QObject::connect(&settings, &AbstractSettings::changed, this, &BoardWidget::update);
+    QObject::connect(&settings, &AbstractSettings::changed, this,
+                     &BoardWidget::update);
 }
 
-void BoardWidget::setBoard(Board board)
-{
+void BoardWidget::setBoard(Board board) {
     m_board = board;
     redraw();
 }
@@ -33,13 +36,9 @@ void BoardWidget::flip() {
     redraw();
 }
 
-void BoardWidget::redraw() {
-    repaint();
-}
+void BoardWidget::redraw() { repaint(); }
 
-void BoardWidget::emitMove(Move move) {
-    emit moveMade(move);
-}
+void BoardWidget::emitMove(Move move) { emit moveMade(move); }
 
 void BoardWidget::update() {
     m_width = width();
@@ -74,11 +73,9 @@ bool BoardWidget::isFieldAt(double x, double y, int* file, int* rank) {
     return false;
 }
 
-void BoardWidget::resizeEvent(QResizeEvent *) {
-    update();
-}
+void BoardWidget::resizeEvent(QResizeEvent*) { update(); }
 
-void BoardWidget::paintEvent(QPaintEvent *) {
+void BoardWidget::paintEvent(QPaintEvent*) {
     QPainter Painter(this);
     draw(Painter);
 }
@@ -117,15 +114,10 @@ void BoardWidget::draw(QPainter& context) {
 }
 
 void BoardWidget::drawBorder(QPainter& context) {
-    static const char* Files[] = {
-        "A", "B", "C", "D", "E", "F", "G", "H"
-    };
-    static const char* Ranks[] = {
-        "1", "2", "3", "4", "5", "6", "7", "8"
-    };
+    static const char* Files[] = {"A", "B", "C", "D", "E", "F", "G", "H"};
+    static const char* Ranks[] = {"1", "2", "3", "4", "5", "6", "7", "8"};
 
-    if (!m_settings.get("boolBorder").toBool())
-        return;
+    if (!m_settings.get("boolBorder").toBool()) return;
 
     int size = m_settings.get("intBorderSize").toInt();
 
@@ -135,10 +127,14 @@ void BoardWidget::drawBorder(QPainter& context) {
     Pen.setWidth(size);
     Pen.setJoinStyle(Qt::MiterJoin);
     context.setPen(Pen);
-    QPointF TopLeft(getFileOffset(0) - 0.5*size, getRankOffset(0) - 0.5*size);
-    QPointF TopRight(getFileOffset(8) + 0.5*size, getRankOffset(0) - 0.5*size);
-    QPointF BottomRight(getFileOffset(8) + 0.5*size, getRankOffset(8) + 0.5*size);
-    QPointF BottomLeft(getFileOffset(0) - 0.5*size, getRankOffset(8) + 0.5*size);
+    QPointF TopLeft(getFileOffset(0) - 0.5 * size,
+                    getRankOffset(0) - 0.5 * size);
+    QPointF TopRight(getFileOffset(8) + 0.5 * size,
+                     getRankOffset(0) - 0.5 * size);
+    QPointF BottomRight(getFileOffset(8) + 0.5 * size,
+                        getRankOffset(8) + 0.5 * size);
+    QPointF BottomLeft(getFileOffset(0) - 0.5 * size,
+                       getRankOffset(8) + 0.5 * size);
     // Fill border with color
     context.drawLine(TopLeft, TopRight);
     context.drawLine(TopRight, BottomRight);
@@ -153,15 +149,15 @@ void BoardWidget::drawBorder(QPainter& context) {
     for (int i = 0; i < 8; i++) {
         int j = absolute(i);
         QRectF FileRect(getFileOffset(i), getRankOffset(8), m_fieldSize, size);
-        QRectF RankRect(getFileOffset(0) - size, getRankOffset(i), size, m_fieldSize);
+        QRectF RankRect(getFileOffset(0) - size, getRankOffset(i), size,
+                        m_fieldSize);
         context.drawText(FileRect, Qt::AlignCenter, Files[j]);
-        context.drawText(RankRect, Qt::AlignCenter, Ranks[7-j]);
+        context.drawText(RankRect, Qt::AlignCenter, Ranks[7 - j]);
     }
 }
 
 void BoardWidget::drawDraggedPiece(QPainter& context) {
-    if (m_draggedField == Coord2D<int>(-1, -1))
-        return;
+    if (m_draggedField == Coord2D<int>(-1, -1)) return;
 
     int FieldX = absolute(m_draggedField.x);
     int FieldY = absolute(m_draggedField.y);
@@ -171,8 +167,7 @@ void BoardWidget::drawDraggedPiece(QPainter& context) {
 
     Piece piece = m_board.pieceAt(m_draggedField);
 
-    if (piece.isNone())
-        return;
+    if (piece.isNone()) return;
 
     drawPiece(context, Dest, piece);
 }
@@ -185,15 +180,16 @@ void BoardWidget::drawField(QPainter& context, int rank, int file) {
     else
         Brush = QBrush(m_settings.get("colorSquareDark").value<QColor>());
 
-    context.fillRect(getFileOffset(file), getRankOffset(rank),
-                     m_fieldSize, m_fieldSize, Brush);
+    context.fillRect(getFileOffset(file), getRankOffset(rank), m_fieldSize,
+                     m_fieldSize, Brush);
 }
 
 void BoardWidget::drawPiece(QPainter& context, QRectF dest, Piece piece) {
     ensureValidPieceSet();
 
     const QRectF source(0, 0, m_fieldSize, m_fieldSize);
-    context.drawPixmap(dest, m_pieceSet->getPiecePixmap(piece, m_fieldSize), source);
+    context.drawPixmap(dest, m_pieceSet->getPiecePixmap(piece, m_fieldSize),
+                       source);
 }
 
 void BoardWidget::drawPiece(QPainter& context, int rank, int file) {
@@ -201,19 +197,18 @@ void BoardWidget::drawPiece(QPainter& context, int rank, int file) {
     int y = absolute(rank);
     Piece Piece = m_board.pieceAt(x, y);
 
-    if (Piece.isNone() || m_draggedField == Coord2D<int>(x, y))
-        return;
+    if (Piece.isNone() || m_draggedField == Coord2D<int>(x, y)) return;
 
-    QRectF Dest(getFileOffset(file), getRankOffset(rank), m_fieldSize, m_fieldSize);
+    QRectF Dest(getFileOffset(file), getRankOffset(rank), m_fieldSize,
+                m_fieldSize);
     drawPiece(context, Dest, Piece);
 }
 
 void BoardWidget::drawSelection(QPainter& context) {
-    if (m_selectedField == Coord2D<int>(-1, -1))
-        return;
+    if (m_selectedField == Coord2D<int>(-1, -1)) return;
     int file = absolute(m_selectedField.x);
     int rank = absolute(m_selectedField.y);
-    int size = 2*int(double(std::min(m_width, m_height)) / MinSize);
+    int size = 2 * int(double(std::min(m_width, m_height)) / MinSize);
     QBrush Brush = QBrush(QColor(0, 0, 0, 0));
     QPen Pen;
     Pen.setColor(m_settings.get("colorPicking").value<QColor>());
@@ -222,8 +217,8 @@ void BoardWidget::drawSelection(QPainter& context) {
 
     context.setPen(Pen);
     context.setBrush(Brush);
-    context.drawRect(getFileOffset(file), getRankOffset(rank),
-                     m_fieldSize, m_fieldSize);
+    context.drawRect(getFileOffset(file), getRankOffset(rank), m_fieldSize,
+                     m_fieldSize);
 }
 
 int BoardWidget::getRankOffset(int rank) const {
@@ -234,15 +229,13 @@ int BoardWidget::getFileOffset(int file) const {
     return m_firstFieldX + file * m_fieldSize;
 }
 
-void BoardWidget::setState(BoardWidgetState *State) {
-    if (State == nullptr)
-        return;
+void BoardWidget::setState(BoardWidgetState* State) {
+    if (State == nullptr) return;
     delete m_state;
     m_state = State;
 }
 
 int BoardWidget::absolute(int coord) const {
-    if (m_flipped)
-        return 7 - coord;
+    if (m_flipped) return 7 - coord;
     return coord;
 }

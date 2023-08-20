@@ -3,7 +3,7 @@
 #include <QStringList>
 
 class VariantInfo {
-public:
+   public:
     VariantInfo();
 
     void setMoveList(const QStringList& moveList);
@@ -19,7 +19,8 @@ public:
     int mate() const;
     int depth() const;
     int nps() const;
-private:
+
+   private:
     QStringList m_moveList;
     int m_id;
     int m_score;

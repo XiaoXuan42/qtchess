@@ -1,14 +1,16 @@
 #ifndef GAME_MODEL_HPP
 #define GAME_MODEL_HPP
-#include "position.hpp"
-#include "move.hpp"
-#include "player.hpp"
+#include <QString>
+#include <cassert>
 #include <map>
 #include <vector>
-#include <cassert>
-#include <QString>
 
-// FIXME: This enumeration is ugly as hell, move specifics should be stored differently.
+#include "move.hpp"
+#include "player.hpp"
+#include "position.hpp"
+
+// FIXME: This enumeration is ugly as hell, move specifics should be stored
+// differently.
 enum MoveType {
     MOVE_NONSPECIAL,
     MOVE_CASTLE_SHORT,
@@ -35,7 +37,7 @@ struct GameState {
 };
 
 class Board {
-public:
+   public:
     static const GameState InitialGameState;
     static const Coord2D<int> A1, B1, C1, D1, F1, G1, H1;
     static const Coord2D<int> A8, B8, C8, D8, F8, G8, H8;
@@ -99,7 +101,8 @@ public:
      * \param retState next state (optional)
      * \param retType move type (optional)
      */
-    bool isLegal(Move move, GameState* retState = nullptr, MoveType* retType = nullptr) const;
+    bool isLegal(Move move, GameState* retState = nullptr,
+                 MoveType* retType = nullptr) const;
 
     /*! \brief Makes the move on the board
      * \return true if the move is done, false otherwise
@@ -119,13 +122,16 @@ public:
     bool hasLongCastlingRights(const Player& player) const;
 
     /*! \brief Returns attacked coordinates by the pieces.
-     * \return list of attacked coordinates by given piece that is located at given position
+     * \return list of attacked coordinates by given piece that is located at
+     * given position
      */
-    CoordsVector getAttackedCoords(Piece piece, Player player, Coord2D<int> position) const;
+    CoordsVector getAttackedCoords(Piece piece, Player player,
+                                   Coord2D<int> position) const;
 
     /*! \brief Returns current player */
     Player currentPlayer() const;
-private:
+
+   private:
     CoordsVector getPawnAttack(int x, int y, Player Owner) const;
     CoordsVector getBishopAttack(int x, int y) const;
     CoordsVector getKnightAttack(int x, int y) const;
@@ -137,7 +143,8 @@ private:
     /* Tests whether given player is in check after given move */
     bool isInCheckAfterTheMove(Player victim, Move move, MoveType type) const;
     /* Check unaware functions, they just test if move has right "geometry" */
-    bool isLegalPawnMove(Move move, MoveType& Special, Coord2D<int>& EnPassantCoords) const;
+    bool isLegalPawnMove(Move move, MoveType& Special,
+                         Coord2D<int>& EnPassantCoords) const;
     bool isLegalKnightMove(Move move) const;
     bool isLegalBishopMove(Move move) const;
     bool isLegalRookMove(Move move) const;
@@ -148,9 +155,10 @@ private:
     bool canCastle(MoveType castleType) const;
     int countAttacksFor(Coord2D<int> coord, Player attacker) const;
     int countChecksFor(Player player) const;
-private:
+
+   private:
     GameState m_state;
     mutable Position m_position;
 };
 
-#endif // GAME_MODEL_HPP
+#endif  // GAME_MODEL_HPP

@@ -4,7 +4,8 @@
 
 class HtmlSettings : public AbstractSettings {
     friend class SettingsFactory;
-private:
+
+   private:
     HtmlSettings();
 };
 

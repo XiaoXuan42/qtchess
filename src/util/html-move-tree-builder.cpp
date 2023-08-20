@@ -1,6 +1,8 @@
 #include "util/html-move-tree-builder.hpp"
-#include "settings/settings-factory.hpp"
+
 #include <QTextDocument>
+
+#include "settings/settings-factory.hpp"
 
 static QString styleSheet = R"(
     <style>
@@ -44,29 +46,29 @@ static QString styleSheet = R"(
     </style>
 )";
 
-HtmlMoveTreeBuilder& HtmlMoveTreeBuilder::addMoveNumber(const QString& number)
-{
-    m_html.append(QString("<span class='TreeMoveNumber'>%1</span>").arg(number));
+HtmlMoveTreeBuilder& HtmlMoveTreeBuilder::addMoveNumber(const QString& number) {
+    m_html.append(
+        QString("<span class='TreeMoveNumber'>%1</span>").arg(number));
     return *this;
 }
 
-HtmlMoveTreeBuilder& HtmlMoveTreeBuilder::addMove(const QString& move, size_t uid,
-                                                  bool isCurrentMove)
-{
+HtmlMoveTreeBuilder& HtmlMoveTreeBuilder::addMove(const QString& move,
+                                                  size_t uid,
+                                                  bool isCurrentMove) {
     QString moveFormatted;
 
     if (isCurrentMove)
-        moveFormatted = QString("<span class='TreeCurrentMove'>%1</span>").arg(move);
+        moveFormatted =
+            QString("<span class='TreeCurrentMove'>%1</span>").arg(move);
     else
         moveFormatted = move;
 
     m_html.append(QString("<a class='TreeMove' href='%1'>%2</a> ")
-          .arg(QString::number(uid), moveFormatted));
+                      .arg(QString::number(uid), moveFormatted));
     return *this;
 }
 
-HtmlMoveTreeBuilder& HtmlMoveTreeBuilder::addVariant(const QString& variant)
-{
+HtmlMoveTreeBuilder& HtmlMoveTreeBuilder::addVariant(const QString& variant) {
     static QString variantLiFmt = "<li class='TreeVariant'>( %1)</li>";
     static QString variantUlFmt = "<ul class='TreeVariant'>%1</ul>";
 
@@ -74,23 +76,20 @@ HtmlMoveTreeBuilder& HtmlMoveTreeBuilder::addVariant(const QString& variant)
     return *this;
 }
 
-HtmlMoveTreeBuilder& HtmlMoveTreeBuilder::addAnnotation(const QString& annotation)
-{
+HtmlMoveTreeBuilder& HtmlMoveTreeBuilder::addAnnotation(
+    const QString& annotation) {
     // This makes that annotation is safe.
     QTextDocument doc;
     doc.setHtml(annotation);
 
-    m_html.append(QString("<span class='Annotation'> { %1 } </span>").arg(doc.toPlainText()));
+    m_html.append(QString("<span class='Annotation'> { %1 } </span>")
+                      .arg(doc.toPlainText()));
     return *this;
 }
 
-QString HtmlMoveTreeBuilder::html() const
-{
-    return m_html;
-}
+QString HtmlMoveTreeBuilder::html() const { return m_html; }
 
-QString HtmlMoveTreeBuilder::htmlWithStyle() const
-{
+QString HtmlMoveTreeBuilder::htmlWithStyle() const {
     HtmlSettings& settings = SettingsFactory::html();
     const auto defaultFontSizePx = 16;
 
@@ -103,12 +102,8 @@ QString HtmlMoveTreeBuilder::htmlWithStyle() const
         settings.get("colorMoveNumber").value<QColor>().name(),
         settings.get("colorAnnotation").value<QColor>().name(),
         QString::number(defaultFontSizePx *
-                        settings.get("fontScaling").value<double>())
-    );
+                        settings.get("fontScaling").value<double>()));
     return style + QString("<div class='TreeBody'>%1</div>").arg(m_html);
 }
 
-bool HtmlMoveTreeBuilder::isEmpty() const
-{
-    return m_html.isEmpty();
-}
+bool HtmlMoveTreeBuilder::isEmpty() const { return m_html.isEmpty(); }

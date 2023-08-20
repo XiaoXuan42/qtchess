@@ -1,24 +1,14 @@
 #include "player.hpp"
 
-Player::Player()
-  : Player(None)
-{ }
+Player::Player() : Player(None) {}
 
-Player::Player(PlayerKind kind)
-  : mKind(kind)
-{ }
+Player::Player(PlayerKind kind) : mKind(kind) {}
 
-Player Player::white() {
-    return Player(White);
-}
+Player Player::white() { return Player(White); }
 
-Player Player::black() {
-    return Player(Black);
-}
+Player Player::black() { return Player(Black); }
 
-Player Player::none() {
-    return Player(None);
-}
+Player Player::none() { return Player(None); }
 
 Player Player::opponent() const {
     if (isWhite())

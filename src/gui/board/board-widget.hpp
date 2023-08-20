@@ -1,9 +1,10 @@
 #ifndef BOARDWIDGET_HPP
 #define BOARDWIDGET_HPP
 
-#include "settings/settings-factory.hpp"
-#include "game/board.hpp"
 #include <QWidget>
+
+#include "game/board.hpp"
+#include "settings/settings-factory.hpp"
 
 class BoardSettings;
 class BoardWidgetState;
@@ -11,13 +12,12 @@ class BoardWidgetStateDragging;
 class BoardWidgetStateNormal;
 class PieceSet;
 
-class BoardWidget : public QWidget
-{
+class BoardWidget : public QWidget {
     friend class BoardWidgetStateDragging;
     friend class BoardWidgetStateNormal;
 
     Q_OBJECT
-public:
+   public:
     explicit BoardWidget(QWidget* parent = 0,
                          BoardSettings& settings = SettingsFactory::board());
 
@@ -29,20 +29,22 @@ public:
     /* Checks if given (x, y) is in some square of the board, if so,
        it initializes rank, file variables */
     bool isFieldAt(double x, double y, int* file, int* rank);
-protected:
+
+   protected:
     virtual void resizeEvent(QResizeEvent*) override;
-    virtual void paintEvent(QPaintEvent *) override;
-    virtual void mousePressEvent(QMouseEvent *) override;
-    virtual void mouseReleaseEvent(QMouseEvent *) override;
-    virtual void mouseMoveEvent(QMouseEvent* ) override;
-signals:
+    virtual void paintEvent(QPaintEvent*) override;
+    virtual void mousePressEvent(QMouseEvent*) override;
+    virtual void mouseReleaseEvent(QMouseEvent*) override;
+    virtual void mouseMoveEvent(QMouseEvent*) override;
+   signals:
     void moveMade(Move);
-public slots:
+   public slots:
     /* Reverses board view */
     void flip();
     /* Redraws entire board */
     void redraw();
-private:
+
+   private:
     /* Ensures valid piece set */
     void ensureValidPieceSet();
     /* Draws board contents */
@@ -67,7 +69,8 @@ private:
     void setState(BoardWidgetState* State);
     /* Returns absolute coordinate depending on board rotation. */
     int absolute(int coord) const;
-private:
+
+   private:
     BoardSettings& m_settings;
     BoardWidgetState* m_state;
     Board m_board;
@@ -87,4 +90,4 @@ private:
     Coord2D<int> m_selectedField;
 };
 
-#endif // BOARDWIDGET_HPP
+#endif  // BOARDWIDGET_HPP

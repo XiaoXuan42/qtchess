@@ -1,11 +1,11 @@
 #ifndef HTML_MOVE_TREE_BUILDER_HPP
 #define HTML_MOVE_TREE_BUILDER_HPP
-#include <QString>
 #include <QColor>
+#include <QString>
 
 /*! \brief Very simple move tree builder. */
 class HtmlMoveTreeBuilder {
-public:
+   public:
     /*! \brief Adds move number string */
     HtmlMoveTreeBuilder& addMoveNumber(const QString& number);
     /*! \brief Adds clickable move string */
@@ -21,8 +21,9 @@ public:
     QString htmlWithStyle() const;
     /*! \brief Returns true when builder string is empty */
     bool isEmpty() const;
-private:
+
+   private:
     QString m_html;
 };
 
-#endif // HTML_MOVE_TREE_BUILDER_HPP
+#endif  // HTML_MOVE_TREE_BUILDER_HPP

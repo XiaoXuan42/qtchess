@@ -1,107 +1,62 @@
 #include "tree.hpp"
+
 #include <QDebug>
 
 TreeNode::TreeNode(const Board& board, TreeNode* parent, TreeNode* parentLine)
-    : m_board(board)
-    , m_parent(parent)
-    , m_parentLine(parentLine)
-{
+    : m_board(board), m_parent(parent), m_parentLine(parentLine) {}
 
+TreeNode::~TreeNode() {
+    for (TreeNode* next : m_moves.values()) delete next;
 }
 
-TreeNode::~TreeNode()
-{
-    for (TreeNode* next : m_moves.values())
-        delete next;
-}
+const Board& TreeNode::board() const { return m_board; }
 
-const Board& TreeNode::board() const
-{
-    return m_board;
-}
+const TreeNode* TreeNode::next() const { return m_mainLine; }
 
-const TreeNode* TreeNode::next() const
-{
-    return m_mainLine;
-}
-
-const TreeNode* TreeNode::next(Move move) const
-{
-    if (m_moves.contains(move))
-        return m_moves[move];
+const TreeNode* TreeNode::next(Move move) const {
+    if (m_moves.contains(move)) return m_moves[move];
     return nullptr;
 }
 
-const TreeNode* TreeNode::parent() const
-{
-    return m_parent;
-}
+const TreeNode* TreeNode::parent() const { return m_parent; }
 
-const TreeNode* TreeNode::parentLine() const
-{
-    return m_parentLine;
-}
+const TreeNode* TreeNode::parentLine() const { return m_parentLine; }
 
-const QString& TreeNode::annotation() const
-{
-    return m_annotation;
-}
+const QString& TreeNode::annotation() const { return m_annotation; }
 
-bool TreeNode::hasNext(Move move) const
-{
-    return m_moves.contains(move);
-}
+bool TreeNode::hasNext(Move move) const { return m_moves.contains(move); }
 
-bool TreeNode::hasNeighbours() const
-{
-    return m_moves.size();
-}
+bool TreeNode::hasNeighbours() const { return m_moves.size(); }
 
-Move TreeNode::nextMove() const
-{
+Move TreeNode::nextMove() const {
     for (const Move& move : m_moves.keys())
-        if (m_moves[move] == m_mainLine)
-            return move;
+        if (m_moves[move] == m_mainLine) return move;
     return Move::NullMove;
 }
 
-QList<Move> TreeNode::nonMainMoves() const
-{
+QList<Move> TreeNode::nonMainMoves() const {
     QList<Move> list = m_moves.keys();
     list.removeOne(nextMove());
     return list;
 }
 
-QList<Move> TreeNode::nextMoves() const
-{
-    return m_moves.keys();
-}
+QList<Move> TreeNode::nextMoves() const { return m_moves.keys(); }
 
-size_t TreeNode::uid() const
-{
-    return reinterpret_cast<size_t>(this);
-}
+size_t TreeNode::uid() const { return reinterpret_cast<size_t>(this); }
 
-TreeNode* TreeNode::fromUid(size_t uid)
-{
+TreeNode* TreeNode::fromUid(size_t uid) {
     return reinterpret_cast<TreeNode*>(uid);
 }
 
-void TreeNode::setMainLine(TreeNode* node)
-{
-    m_mainLine = node;
-}
+void TreeNode::setMainLine(TreeNode* node) { m_mainLine = node; }
 
-void TreeNode::addTransition(Move move, TreeNode* node)
-{
-    if (!hasNeighbours())
-        setMainLine(node);
+void TreeNode::addTransition(Move move, TreeNode* node) {
+    if (!hasNeighbours()) setMainLine(node);
 
     m_moves[move] = node;
 }
 
-TreeNode* TreeNode::delTransition(Move move)
-{
+TreeNode* TreeNode::delTransition(Move move) {
     TreeNode* node = m_moves[move];
     m_moves.remove(move);
 
@@ -115,86 +70,60 @@ TreeNode* TreeNode::delTransition(Move move)
     return node;
 }
 
-bool TreeNode::isChildNode(TreeNode* node) const
-{
-    if (m_moves.values().contains(node))
-        return true;
+bool TreeNode::isChildNode(TreeNode* node) const {
+    if (m_moves.values().contains(node)) return true;
 
     for (const Move& move : m_moves.keys())
-        if (m_moves[move]->isChildNode(node))
-            return true;
+        if (m_moves[move]->isChildNode(node)) return true;
     return false;
 }
 
-void TreeNode::setBoard(const Board& board)
-{
-    m_board = board;
-}
+void TreeNode::setBoard(const Board& board) { m_board = board; }
 
-void TreeNode::setParentLine(TreeNode* node)
-{
-    m_parentLine = node;
-}
+void TreeNode::setParentLine(TreeNode* node) { m_parentLine = node; }
 
-void TreeNode::setParent(TreeNode* node)
-{
-    m_parent = node;
-}
+void TreeNode::setParent(TreeNode* node) { m_parent = node; }
 
-void TreeNode::setAnnotation(const QString& annotation)
-{
+void TreeNode::setAnnotation(const QString& annotation) {
     m_annotation = annotation;
 }
 
-TreeNode* TreeNode::next()
-{
+TreeNode* TreeNode::next() {
     return const_cast<TreeNode*>(const_cast<const TreeNode*>(this)->next());
 }
 
-TreeNode* TreeNode::next(Move move)
-{
+TreeNode* TreeNode::next(Move move) {
     return const_cast<TreeNode*>(const_cast<const TreeNode*>(this)->next(move));
 }
 
-TreeNode* TreeNode::parent()
-{
+TreeNode* TreeNode::parent() {
     return const_cast<TreeNode*>(const_cast<const TreeNode*>(this)->parent());
 }
 
-TreeNode* TreeNode::parentLine()
-{
-    return const_cast<TreeNode*>(const_cast<const TreeNode*>(this)->parentLine());
+TreeNode* TreeNode::parentLine() {
+    return const_cast<TreeNode*>(
+        const_cast<const TreeNode*>(this)->parentLine());
 }
 
-Tree::Tree()
-    : m_current(&m_root)
-{
-}
+Tree::Tree() : m_current(&m_root) {}
 
-const TreeNode* Tree::rootNode() const
-{
-    return &m_root;
-}
+const TreeNode* Tree::rootNode() const { return &m_root; }
 
-const TreeNode* Tree::currentNode() const
-{
-    return m_current;
-}
+const TreeNode* Tree::currentNode() const { return m_current; }
 
-bool Tree::addMove(Move move)
-{
-    if (!m_current->board().isLegal(move))
-        return false;
+bool Tree::addMove(Move move) {
+    if (!m_current->board().isLegal(move)) return false;
 
     if (!m_current->hasNext(move)) {
         Board board = m_current->board();
-        board.makeMove(move);     
+        board.makeMove(move);
         TreeNode* node;
 
         if (m_current->hasNeighbours())
             node = new TreeNode(board, m_current, m_current);
         else
-            node = new TreeNode(board, m_current, const_cast<TreeNode*>(m_current->parentLine()));
+            node = new TreeNode(board, m_current,
+                                const_cast<TreeNode*>(m_current->parentLine()));
 
         m_current->addTransition(move, node);
         m_current = node;
@@ -207,19 +136,16 @@ bool Tree::addMove(Move move)
     return true;
 }
 
-bool Tree::delMove(Move move)
-{
-    if (!m_current->hasNext(move))
-        return false;
+bool Tree::delMove(Move move) {
+    if (!m_current->hasNext(move)) return false;
 
     delete m_current->delTransition(move);
 
-    //emit changed();
+    // emit changed();
     return true;
 }
 
-void Tree::clear()
-{
+void Tree::clear() {
     m_current = &m_root;
 
     for (const Move& move : m_root.nextMoves())
@@ -228,23 +154,20 @@ void Tree::clear()
     emit changed();
 }
 
-void Tree::setCurrent(TreeNode* node)
-{
+void Tree::setCurrent(TreeNode* node) {
     Q_ASSERT(node && "Setting null node.");
 
     m_current = node;
     emit changed();
 }
 
-void Tree::setRootBoard(const Board& board)
-{
+void Tree::setRootBoard(const Board& board) {
     clear();
     m_current->setBoard(board);
     emit changed();
 }
 
-void Tree::remove(TreeNode* node)
-{
+void Tree::remove(TreeNode* node) {
     if (node == &m_root)
         clear();
     else {
@@ -253,8 +176,7 @@ void Tree::remove(TreeNode* node)
 
         // If current was not a child node of the removed node, then
         // do not change m_current pointer to parent.
-        if (!current->isChildNode(node))
-            current = parent;
+        if (!current->isChildNode(node)) current = parent;
 
         m_current = parent;
 
@@ -271,8 +193,7 @@ void Tree::remove(TreeNode* node)
     }
 }
 
-bool Tree::promote(TreeNode* node)
-{
+bool Tree::promote(TreeNode* node) {
     Q_ASSERT(node && "Promoting null node.");
 
     // Lets assume it the tree looks like this and consider segments:
@@ -280,8 +201,7 @@ bool Tree::promote(TreeNode* node)
     // [-----------1-----------] [---------2---------] [------3------]
 
     // Main line cannot be promoted.
-    if (!node->parentLine())
-        return false;
+    if (!node->parentLine()) return false;
 
     // First element in the line containing a node. We can imagine this
     // by assuming that node points for example to 4. a4, then firstInLine
@@ -313,13 +233,12 @@ bool Tree::promote(TreeNode* node)
     return true;
 }
 
-void Tree::promoteToMainline(TreeNode* node)
-{
-    while (promote(node));
+void Tree::promoteToMainline(TreeNode* node) {
+    while (promote(node))
+        ;
 }
 
-void Tree::annotate(TreeNode* node, const QString& annotation)
-{
+void Tree::annotate(TreeNode* node, const QString& annotation) {
     Q_ASSERT(node && "Annotated null node");
 
     node->setAnnotation(annotation);

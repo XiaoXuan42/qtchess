@@ -13,22 +13,24 @@ class AbstractSettings;
 
 class SettingsDialog : public QDialog {
     Q_OBJECT
-public:
+   public:
     explicit SettingsDialog(QWidget* parent);
     ~SettingsDialog();
-private slots:
+   private slots:
     void pieceSetChanged(const QString& value);
     void saveClicked();
     void resetClicked();
-private:
-    Ui::SettingsDialog *ui;
+
+   private:
+    Ui::SettingsDialog* ui;
 
     void mapWithSetting(AbstractSettings&, QString key, ColorButton* button);
     void mapWithSetting(AbstractSettings&, QString key, QCheckBox* box);
     void mapWithSetting(AbstractSettings&, QString key, QLineEdit* line);
 
-    /*! \brief Reads settings and updates widgets to represent current settings state. */
+    /*! \brief Reads settings and updates widgets to represent current settings
+     * state. */
     void readSettings();
 };
 
-#endif // SETTINGS_DIALOG_HPP
+#endif  // SETTINGS_DIALOG_HPP

@@ -1,14 +1,15 @@
 #ifndef COLOR_BUTTON_HPP
 #define COLOR_BUTTON_HPP
-#include <QPushButton>
-#include <QColorDialog>
 #include <QColor>
+#include <QColorDialog>
+#include <QPushButton>
 
 class ColorButton : public QPushButton {
     Q_OBJECT
-public:
+   public:
     /*! \brief constructs transparent color button */
-    explicit ColorButton(QWidget* parent = 0, const QColor& color = QColor(0, 0, 0, 0));
+    explicit ColorButton(QWidget* parent = 0,
+                         const QColor& color = QColor(0, 0, 0, 0));
 
     /*! \brief returns currently selected color */
     const QColor& color() const { return m_currentColor; }
@@ -18,16 +19,17 @@ public:
 
     /*! \brief overloaded to disallow drawing text on the button */
     virtual void setText(const QString& text);
-signals:
+   signals:
     /*! \brief signal emited when color has been selected in color chooser */
     void changed(QColor);
-private slots:
+   private slots:
     /*! \brief called when color has been changed */
     void onChanged(const QColor&);
     /*! \brief called when somebody clicked the button */
     void onClicked(bool);
-private:
+
+   private:
     QColor m_currentColor;
 };
 
-#endif // color-button.hpp
+#endif  // color-button.hpp

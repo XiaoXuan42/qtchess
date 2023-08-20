@@ -4,7 +4,8 @@
 
 class BoardSettings : public AbstractSettings {
     friend class SettingsFactory;
-private:
+
+   private:
     BoardSettings();
 };
 

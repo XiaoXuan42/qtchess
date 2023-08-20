@@ -1,12 +1,21 @@
 #ifndef PIECES_HPP
 #define PIECES_HPP
-#include "game/player.hpp"
-#include "common.hpp"
 #include <QString>
 
+#include "common.hpp"
+#include "game/player.hpp"
+
 class Piece {
-public:
-    enum Type { None = -1, Pawn = 0, Knight = 1, Bishop = 2, Rook = 3, Queen = 4, King = 5 };
+   public:
+    enum Type {
+        None = -1,
+        Pawn = 0,
+        Knight = 1,
+        Bishop = 2,
+        Rook = 3,
+        Queen = 4,
+        King = 5
+    };
 
     /*! \brief returns one-character string piece representation */
     QString symbolString() const;
@@ -15,7 +24,8 @@ public:
     explicit Piece(QChar symbol);
 
     /*! \brief constructs piece owned by given player */
-    explicit Piece(Piece::Type type = Piece::Type::None, Player owner = Player::none());
+    explicit Piece(Piece::Type type = Piece::Type::None,
+                   Player owner = Player::none());
 
     /*! \brief checks whether this is a none-piece */
     inline bool isNone() const { return mType == None; }
@@ -56,7 +66,7 @@ public:
         return static_cast<int>(mType) < static_cast<int>(piece.type());
     }
 
-private:
+   private:
     Piece::Type mType;
     Player mOwner;
 };

@@ -1,10 +1,11 @@
 #ifndef ENGINE_CONFIG_HPP
 #define ENGINE_CONFIG_HPP
 #include <QVariantMap>
+
 #include "engine/engine-option.hpp"
 
 class EngineConfig {
-public:
+   public:
     EngineConfig() = default;
 
     /*! \brief Initializes instance from variant map */
@@ -33,9 +34,10 @@ public:
     QVariantMap toVariantMap() const;
 
     /*! \brief Compares whether instances of EngineConfig are equal */
-    bool operator== (const EngineConfig& rhs) const;
-    bool operator!= (const EngineConfig& rhs) const;
-private:
+    bool operator==(const EngineConfig& rhs) const;
+    bool operator!=(const EngineConfig& rhs) const;
+
+   private:
     QString m_name;
     QString m_command;
     QString m_workdir;
@@ -43,4 +45,4 @@ private:
     QVariantMap m_options;
 };
 
-#endif // ENGINE_SETTINGS_HPP
+#endif  // ENGINE_SETTINGS_HPP

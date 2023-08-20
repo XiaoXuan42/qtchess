@@ -1,19 +1,19 @@
 #ifndef PIECESET_HPP
 #define PIECESET_HPP
-#include <game/pieces.hpp>
-#include <game/board.hpp>
+#include <QDebug>
+#include <QPixmap>
 #include <QString>
 #include <QtSvg/QSvgRenderer>
-#include <QPixmap>
-#include <QDebug>
+#include <game/board.hpp>
+#include <game/pieces.hpp>
 #include <map>
 
-class PieceSet
-{
-public:
+class PieceSet {
+   public:
     // Returns list of available sets names
     static QStringList getAvailableSets();
-public:
+
+   public:
     PieceSet(QString StyleName);
     ~PieceSet();
     PieceSet(const PieceSet&) = delete;
@@ -27,7 +27,8 @@ public:
     QPixmap& getPiecePixmap(Piece piece, int size);
     /* Returns piece set style name */
     QString styleName() const;
-private:
+
+   private:
     QString mStyleName;
     std::map<std::pair<Piece::Type, Player>, QSvgRenderer*> mPieceRenderers;
     /* Cached, prerendered pixmaps */
@@ -36,4 +37,4 @@ private:
     std::map<QSvgRenderer*, int> mPixmapSize;
 };
 
-#endif // PIECESET_HPP
+#endif  // PIECESET_HPP

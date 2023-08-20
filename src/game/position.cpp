@@ -1,10 +1,8 @@
 #include "game/position.hpp"
 
-Position::Position() 
-{
+Position::Position() {
     for (int i = 0; i < 8; i++)
-    for (int j = 0; j < 8; j++)
-        setPieceAt(i, j, Piece());
+        for (int j = 0; j < 8; j++) setPieceAt(i, j, Piece());
 }
 
 const Piece& Position::pieceAt(int file, int rank) const {
@@ -16,18 +14,12 @@ void Position::setPieceAt(int file, int rank, Piece piece) {
 }
 
 Position Position::defaultPosition() {
-    static Piece::Type piecesRank[] = {
-        Piece::Type::Rook,
-        Piece::Type::Knight,
-        Piece::Type::Bishop,
-        Piece::Type::Queen,
-        Piece::Type::King,
-        Piece::Type::Bishop,
-        Piece::Type::Knight,
-        Piece::Type::Rook
-    };
+    static Piece::Type piecesRank[] = {Piece::Type::Rook,   Piece::Type::Knight,
+                                       Piece::Type::Bishop, Piece::Type::Queen,
+                                       Piece::Type::King,   Piece::Type::Bishop,
+                                       Piece::Type::Knight, Piece::Type::Rook};
     Position position;
-    
+
     for (int file = 0; file < 8; file++) {
         position.setPieceAt(file, 0, Piece(piecesRank[file], Player::black()));
         position.setPieceAt(file, 1, Piece(Piece::Type::Pawn, Player::black()));
@@ -38,12 +30,10 @@ Position Position::defaultPosition() {
     return position;
 }
 
-Position Position::emptyPosition()
-{
+Position Position::emptyPosition() {
     Position position;
 
     for (int i = 0; i < 8; i++)
-    for (int j = 0; j < 8; j++)
-        position.setPieceAt(i, j, Piece());
+        for (int j = 0; j < 8; j++) position.setPieceAt(i, j, Piece());
     return position;
 }

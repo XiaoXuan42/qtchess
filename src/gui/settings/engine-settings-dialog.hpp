@@ -8,15 +8,16 @@ class EngineSettingsDialog;
 
 class EngineSettingsDialog : public QDialog {
     Q_OBJECT
-public:
+   public:
     explicit EngineSettingsDialog(QWidget* parent = 0);
     ~EngineSettingsDialog();
-private slots:
+   private slots:
     void onRemoveClicked();
     void onCreateClicked();
     void onEditClicked();
-private:
-    Ui::EngineSettingsDialog *ui;
+
+   private:
+    Ui::EngineSettingsDialog* ui;
 };
 
-#endif // ENGINE_SETTINGS_DIALOG_HPP
+#endif  // ENGINE_SETTINGS_DIALOG_HPP
