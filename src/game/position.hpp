@@ -5,7 +5,7 @@
 #include "game/pieces.hpp"
 
 class Position {
-   public:
+public:
     /*! \brief initializes position to the default position */
     Position();
 
@@ -21,7 +21,7 @@ class Position {
     /*! \brief constructs empty position */
     static Position emptyPosition();
 
-   private:
+private:
     Piece mSquares[8][8];
 };
 

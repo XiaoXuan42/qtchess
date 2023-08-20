@@ -11,12 +11,12 @@ class PromotionDialog;
 class PromotionDialog : public QDialog {
     Q_OBJECT
 
-   public:
+public:
     explicit PromotionDialog(QWidget *parent = 0);
     ~PromotionDialog();
 
     Piece::Type selectedPieceType() const { return mSelectedPieceType; }
-   private slots:
+private slots:
     void selectedQueen() {
         mSelectedPieceType = Piece::Queen;
         emit done(0);
@@ -34,7 +34,7 @@ class PromotionDialog : public QDialog {
         emit done(0);
     }
 
-   private:
+private:
     Piece::Type mSelectedPieceType;
     Ui::PromotionDialog *ui;
 };

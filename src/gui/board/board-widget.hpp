@@ -17,7 +17,7 @@ class BoardWidget : public QWidget {
     friend class BoardWidgetStateNormal;
 
     Q_OBJECT
-   public:
+public:
     explicit BoardWidget(QWidget* parent = 0,
                          BoardSettings& settings = SettingsFactory::board());
 
@@ -30,21 +30,21 @@ class BoardWidget : public QWidget {
        it initializes rank, file variables */
     bool isFieldAt(double x, double y, int* file, int* rank);
 
-   protected:
+protected:
     virtual void resizeEvent(QResizeEvent*) override;
     virtual void paintEvent(QPaintEvent*) override;
     virtual void mousePressEvent(QMouseEvent*) override;
     virtual void mouseReleaseEvent(QMouseEvent*) override;
     virtual void mouseMoveEvent(QMouseEvent*) override;
-   signals:
+signals:
     void moveMade(Move);
-   public slots:
+public slots:
     /* Reverses board view */
     void flip();
     /* Redraws entire board */
     void redraw();
 
-   private:
+private:
     /* Ensures valid piece set */
     void ensureValidPieceSet();
     /* Draws board contents */
@@ -70,7 +70,7 @@ class BoardWidget : public QWidget {
     /* Returns absolute coordinate depending on board rotation. */
     int absolute(int coord) const;
 
-   private:
+private:
     BoardSettings& m_settings;
     BoardWidgetState* m_state;
     Board m_board;

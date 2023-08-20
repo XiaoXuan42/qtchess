@@ -5,7 +5,7 @@
 #include "engine/engine-option.hpp"
 
 class EngineConfig {
-   public:
+public:
     EngineConfig() = default;
 
     /*! \brief Initializes instance from variant map */
@@ -37,7 +37,7 @@ class EngineConfig {
     bool operator==(const EngineConfig& rhs) const;
     bool operator!=(const EngineConfig& rhs) const;
 
-   private:
+private:
     QString m_name;
     QString m_command;
     QString m_workdir;

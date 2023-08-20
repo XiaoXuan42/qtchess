@@ -9,11 +9,11 @@
 #include <map>
 
 class PieceSet {
-   public:
+public:
     // Returns list of available sets names
     static QStringList getAvailableSets();
 
-   public:
+public:
     PieceSet(QString StyleName);
     ~PieceSet();
     PieceSet(const PieceSet&) = delete;
@@ -28,7 +28,7 @@ class PieceSet {
     /* Returns piece set style name */
     QString styleName() const;
 
-   private:
+private:
     QString mStyleName;
     std::map<std::pair<Piece::Type, Player>, QSvgRenderer*> mPieceRenderers;
     /* Cached, prerendered pixmaps */

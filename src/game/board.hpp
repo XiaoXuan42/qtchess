@@ -37,7 +37,7 @@ struct GameState {
 };
 
 class Board {
-   public:
+public:
     static const GameState InitialGameState;
     static const Coord2D<int> A1, B1, C1, D1, F1, G1, H1;
     static const Coord2D<int> A8, B8, C8, D8, F8, G8, H8;
@@ -131,7 +131,7 @@ class Board {
     /*! \brief Returns current player */
     Player currentPlayer() const;
 
-   private:
+private:
     CoordsVector getPawnAttack(int x, int y, Player Owner) const;
     CoordsVector getBishopAttack(int x, int y) const;
     CoordsVector getKnightAttack(int x, int y) const;
@@ -156,7 +156,7 @@ class Board {
     int countAttacksFor(Coord2D<int> coord, Player attacker) const;
     int countChecksFor(Player player) const;
 
-   private:
+private:
     GameState m_state;
     mutable Position m_position;
 };

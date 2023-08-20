@@ -2,7 +2,7 @@
 #define PLAYER_HPP
 
 class Player {
-   public:
+public:
     Player();
 
     bool isWhite() const { return mKind == White; }
@@ -24,7 +24,7 @@ class Player {
     static Player black();
     static Player none();
 
-   private:
+private:
     enum PlayerKind { White = 0, Black, None };
     Player(PlayerKind);
 

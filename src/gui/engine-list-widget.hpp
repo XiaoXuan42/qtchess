@@ -4,7 +4,7 @@
 
 class EngineListWidget : public QListWidget {
     Q_OBJECT
-   public:
+public:
     explicit EngineListWidget(QWidget* parent = 0);
     ~EngineListWidget() = default;
 
@@ -13,12 +13,12 @@ class EngineListWidget : public QListWidget {
 
     /*! \brief Tests whether there is something currently selected */
     bool selected() const;
-   public slots:
+public slots:
     void update();
-   private slots:
+private slots:
     void onClicked(QModelIndex);
 
-   private:
+private:
     QStringList m_engines;
     int m_currentId;
 };

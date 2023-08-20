@@ -10,7 +10,7 @@ class Tree;
 class TreeNode {
     friend class Tree;
 
-   public:
+public:
     ~TreeNode();
 
     TreeNode(const Board& board = Board(), TreeNode* parent = nullptr,
@@ -78,7 +78,7 @@ class TreeNode {
     /*! \brief Sets annotation */
     void setAnnotation(const QString& annotation);
 
-   private:
+private:
     /*! \brief Sets current board */
     void setBoard(const Board& board);
 
@@ -89,7 +89,7 @@ class TreeNode {
     TreeNode* parent();
     TreeNode* parentLine();
 
-   private:
+private:
     /*!< chess-board snapshot */
     Board m_board;
     /*!< main line in this line */
@@ -106,7 +106,7 @@ class TreeNode {
 
 class Tree : public QObject {
     Q_OBJECT
-   public:
+public:
     /*! \brief Constructs an empty tree */
     Tree();
 
@@ -148,11 +148,11 @@ class Tree : public QObject {
 
     /*! \brief Annotates given node */
     void annotate(TreeNode* node, const QString& annotation);
-   signals:
+signals:
     /*! \brief Emited when tree is changed */
     void changed();
 
-   private:
+private:
     /*! \brief Root node */
     TreeNode m_root;
     /*! \brief Currently active node */

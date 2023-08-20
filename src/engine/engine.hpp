@@ -10,7 +10,7 @@
 class Board;
 class Engine : public QObject {
     Q_OBJECT
-   public:
+public:
     enum State { Working, Stopping, Idling, Initializing };
 
     explicit Engine(const EngineConfig& config, const int timeoutMs = 2000);
@@ -39,14 +39,14 @@ class Engine : public QObject {
 
     /*! \brief Returns parsed options. */
     const QList<EngineOption>& options();
-   signals:
+signals:
     void variantParsed(VariantInfo);
     void optionsParsed(QList<EngineOption>);
-   private slots:
+private slots:
     void onStarted();
     void onReadyRead();
 
-   private:
+private:
     /*! \brief Waits for state change to a specific one or throws. */
     void waitForStateOrThrow(State expectedState);
 

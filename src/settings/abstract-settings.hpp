@@ -5,7 +5,7 @@
 
 class AbstractSettings : public QObject {
     Q_OBJECT
-   public:
+public:
     AbstractSettings(const QString& logicalGroup, const QString& subGroup = "");
 
     /*! \brief Gets value when the key exists either in memory or in file,
@@ -30,11 +30,11 @@ class AbstractSettings : public QObject {
 
     /*! \brief Saves all keys to file. */
     virtual void save();
-   signals:
+signals:
     /*! \brief Emited whenever setValue() or reset() is called. */
     void changed();
 
-   private:
+private:
     QSettings m_settings;
     QVariantMap m_values;
 };

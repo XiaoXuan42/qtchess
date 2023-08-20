@@ -13,7 +13,7 @@ class QTableWidget;
 
 class EngineEditDialog : public QDialog {
     Q_OBJECT
-   public:
+public:
     explicit EngineEditDialog(EngineConfig config = EngineConfig(),
                               QWidget* parent = 0);
     ~EngineEditDialog();
@@ -22,12 +22,12 @@ class EngineEditDialog : public QDialog {
      * It is valid if and only if dialog emited \a accept().
      */
     EngineConfig engineConfig() const;
-   private slots:
+private slots:
     void onOkClicked();
     void onCancelClicked();
     void onConfigureClicked();
 
-   private:
+private:
     bool settingsValid();
 
     Ui::EngineEditDialog* ui;

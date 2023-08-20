@@ -8,7 +8,7 @@
 #include "settings/layout-settings.hpp"
 
 class SettingsFactory {
-   public:
+public:
     SettingsFactory() = delete;
 
     static BoardSettings& board() {

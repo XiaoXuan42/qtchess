@@ -9,14 +9,14 @@
 
 class EngineSelectionDialog : public QDialog {
     Q_OBJECT
-   public:
+public:
     explicit EngineSelectionDialog(QWidget* parent = nullptr);
 
     QString engineName() const { return m_engineName; }
-   private slots:
+private slots:
     void onDoubleClicked();
 
-   private:
+private:
     EngineListWidget* m_list;
     QPushButton* m_cancelButton;
     QString m_engineName;

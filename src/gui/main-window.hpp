@@ -12,10 +12,10 @@ class MainWindow;
 class TreeNode;
 class MainWindow : public QMainWindow {
     Q_OBJECT
-   public:
+public:
     explicit MainWindow(QWidget *parent);
     ~MainWindow();
-   private slots:
+private slots:
     void onMoveMade(Move move);
     void onSettingsShow();
     void onEnginesShow();
@@ -26,7 +26,7 @@ class MainWindow : public QMainWindow {
     void onSetFen();
     void closeEvent(QCloseEvent *);
 
-   private:
+private:
     Ui::MainWindow *ui;
     // Game tree
     Tree m_tree;

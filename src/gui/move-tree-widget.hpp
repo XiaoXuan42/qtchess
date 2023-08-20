@@ -7,18 +7,18 @@
 
 class HtmlMoveTreeBuilder;
 class TreeHtml {
-   public:
+public:
     /*! \brief Returns html representation of the tree */
     static QString html(const Tree*);
 
-   private:
+private:
     static void traverse(HtmlMoveTreeBuilder& builder, Move lastMove,
                          const TreeNode* node, const Tree* tree);
 };
 
 class MoveTreeWidget : public QWebEngineView {
     Q_OBJECT
-   public:
+public:
     explicit MoveTreeWidget(QWidget* parent = nullptr);
 
     /*! \brief Sets tree that will be rendered by this widget */
@@ -27,13 +27,13 @@ class MoveTreeWidget : public QWebEngineView {
     /*! \brief Returns satisfactory size */
     virtual QSize sizeHint() const;
 
-   protected:
+protected:
     /*! \brief Displays custom context menu */
     virtual void contextMenuEvent(QContextMenuEvent*);
-   public slots:
+public slots:
     /*! \brief Issues redraw */
     void redraw();
-   private slots:
+private slots:
     void onMoveNext();
     void onMovePrev();
     void onMoveClicked(const QUrl&);
@@ -43,10 +43,10 @@ class MoveTreeWidget : public QWebEngineView {
     void onPromoteUp();
     void onPromoteToMainline();
     void onRemove();
-   signals:
+signals:
     void moveSelected(size_t);
 
-   private:
+private:
     Tree* m_tree;
     /*!< Currently hovered node uid or 0. */
     size_t m_hoveredMoveUid;

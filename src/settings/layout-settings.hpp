@@ -5,10 +5,10 @@
 class LayoutSettings : public AbstractSettings {
     friend class SettingsFactory;
 
-   private:
+private:
     LayoutSettings();
 
-   public:
+public:
     static constexpr const char *MAIN_WINDOW_GEOMETRY = "mainWindowGeometry";
     static constexpr const char *MAIN_WINDOW_STATE = "mainWindowState";
 };

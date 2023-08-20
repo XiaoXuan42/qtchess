@@ -6,7 +6,7 @@
 
 class ColorButton : public QPushButton {
     Q_OBJECT
-   public:
+public:
     /*! \brief constructs transparent color button */
     explicit ColorButton(QWidget* parent = 0,
                          const QColor& color = QColor(0, 0, 0, 0));
@@ -19,16 +19,16 @@ class ColorButton : public QPushButton {
 
     /*! \brief overloaded to disallow drawing text on the button */
     virtual void setText(const QString& text);
-   signals:
+signals:
     /*! \brief signal emited when color has been selected in color chooser */
     void changed(QColor);
-   private slots:
+private slots:
     /*! \brief called when color has been changed */
     void onChanged(const QColor&);
     /*! \brief called when somebody clicked the button */
     void onClicked(bool);
 
-   private:
+private:
     QColor m_currentColor;
 };
 

@@ -5,7 +5,7 @@
 #include "board-widget.hpp"
 
 class BoardWidgetState {
-   public:
+public:
     virtual ~BoardWidgetState() = default;
     /* Every virtual method returns nullptr by default indicating that
        no state change occurs. */
@@ -22,14 +22,14 @@ class BoardWidgetState {
 
 /* Concrete subclasses defining behaviour */
 class BoardWidgetStateDragging : public BoardWidgetState {
-   public:
+public:
     virtual BoardWidgetState* onMouseRelease(BoardWidget*,
                                              QMouseEvent*) override;
     virtual BoardWidgetState* onMouseMove(BoardWidget*, QMouseEvent*) override;
 };
 
 class BoardWidgetStateNormal : public BoardWidgetState {
-   public:
+public:
     virtual BoardWidgetState* onMousePress(BoardWidget*, QMouseEvent*) override;
 };
 

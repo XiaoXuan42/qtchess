@@ -6,7 +6,7 @@
 #include "game/player.hpp"
 
 class Piece {
-   public:
+public:
     enum Type {
         None = -1,
         Pawn = 0,
@@ -66,7 +66,7 @@ class Piece {
         return static_cast<int>(mType) < static_cast<int>(piece.type());
     }
 
-   private:
+private:
     Piece::Type mType;
     Player mOwner;
 };

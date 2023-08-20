@@ -5,7 +5,7 @@
 
 /*! \brief Very simple move tree builder. */
 class HtmlMoveTreeBuilder {
-   public:
+public:
     /*! \brief Adds move number string */
     HtmlMoveTreeBuilder& addMoveNumber(const QString& number);
     /*! \brief Adds clickable move string */
@@ -22,7 +22,7 @@ class HtmlMoveTreeBuilder {
     /*! \brief Returns true when builder string is empty */
     bool isEmpty() const;
 
-   private:
+private:
     QString m_html;
 };
 

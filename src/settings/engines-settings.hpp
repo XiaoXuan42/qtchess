@@ -7,10 +7,10 @@ class EngineConfig;
 class EnginesSettings : public AbstractSettings {
     friend class SettingsFactory;
 
-   private:
+private:
     EnginesSettings();
 
-   public:
+public:
     /*! \brief Returns list of registered engines names */
     QStringList names() const;
 

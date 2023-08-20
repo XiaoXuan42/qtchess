@@ -3,7 +3,7 @@
 #include <QVariantMap>
 
 class EngineOption {
-   public:
+public:
     EngineOption() = default;
 
     enum Type {
@@ -42,7 +42,7 @@ class EngineOption {
     /*! \brief Returns name */
     QString name() const;
 
-   private:
+private:
     EngineOption(Type type, QString name, QMap<Entry, QVariant> entries);
 
     QMap<Entry, QVariant> m_entries;
