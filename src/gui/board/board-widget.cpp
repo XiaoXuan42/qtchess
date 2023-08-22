@@ -4,7 +4,7 @@
 #include <algorithm>
 
 #include "gui/board/board-widget-state.hpp"
-#include "piece-set.hpp"
+#include "game/piece-set.hpp"
 
 static const int MinSize = 256;
 

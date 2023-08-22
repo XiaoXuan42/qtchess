@@ -29,7 +29,7 @@
      <x>0</x>
      <y>0</y>
      <width>942</width>
-     <height>31</height>
+     <height>24</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuEdit">
@@ -53,8 +53,16 @@
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
+   <widget class="QMenu" name="menutools">
+    <property name="title">
+     <string>View</string>
+    </property>
+    <addaction name="actionViewPGN"/>
+    <addaction name="actionViewEngine"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
+   <addaction name="menutools"/>
   </widget>
   <widget class="QDockWidget" name="pgnDock">
    <property name="minimumSize">
@@ -78,8 +86,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>178</width>
-          <height>412</height>
+          <width>174</width>
+          <height>429</height>
          </rect>
         </property>
        </widget>
@@ -134,6 +142,28 @@
     <string>E&amp;ngines</string>
    </property>
   </action>
+  <action name="actionViewPGN">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>ViewPGN</string>
+   </property>
+  </action>
+  <action name="actionViewEngine">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>ViewEngine</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
@@ -157,5 +187,54 @@
   </customwidget>
  </customwidgets>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>actionViewPGN</sender>
+   <signal>triggered(bool)</signal>
+   <receiver>pgnDock</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>841</x>
+     <y>262</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionViewEngine</sender>
+   <signal>triggered(bool)</signal>
+   <receiver>engineDock</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>841</x>
+     <y>567</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pgnDock</sender>
+   <signal>visibilityChanged(bool)</signal>
+   <receiver>actionViewPGN</receiver>
+   <slot>setChecked(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>841</x>
+     <y>262</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

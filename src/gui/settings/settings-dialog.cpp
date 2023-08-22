@@ -1,6 +1,6 @@
 #include "gui/settings/settings-dialog.hpp"
 
-#include "piece-set.hpp"
+#include "game/piece-set.hpp"
 #include "settings/settings-factory.hpp"
 #include "ui_settings-dialog.h"
 

@@ -1,4 +1,4 @@
-#include "piece-set.hpp"
+#include "game/piece-set.hpp"
 
 #include <QDebug>
 #include <QDir>

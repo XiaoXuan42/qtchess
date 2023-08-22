@@ -26,6 +26,8 @@ src/game/position.cpp
 src/game/position.hpp
 src/game/tree.cpp
 src/game/tree.hpp
+src/game/piece-set.hpp
+src/game/piece-set.cpp
 src/gui/board-widget-state.cpp
 src/gui/board-widget-state.hpp
 src/gui/board-widget.cpp
