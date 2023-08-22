@@ -1,7 +1,6 @@
 #ifndef GAME_TREE_HPP
 #define GAME_TREE_HPP
 #include <QMap>
-#include <QObject>
 
 #include "game/board.hpp"
 
@@ -13,11 +12,7 @@ class TreeNode {
 public:
     ~TreeNode();
 
-    TreeNode(const Board& board = Board(), TreeNode* parent = nullptr,
-             TreeNode* parentLine = nullptr);
-
-    /*! \brief Returns node current board */
-    const Board& board() const;
+    TreeNode(TreeNode* parent, TreeNode* parentLine, const Move &parentMove);
 
     /*! \brief Returns next node in the mainline */
     const TreeNode* next() const;
@@ -31,9 +26,6 @@ public:
 
     /*! \brief Returns parent line node */
     const TreeNode* parentLine() const;
-
-    /*! \brief Returns node annotation. */
-    const QString& annotation() const;
 
     /*! \brief Checks whether \a move is one of the next moves. */
     bool hasNext(Move move) const;
@@ -73,15 +65,11 @@ public:
     void setParentLine(TreeNode* node);
 
     /*! \brief Sets parent pointer */
-    void setParent(TreeNode* node);
+    void setParent(TreeNode* node, const Move &parentMove);
 
-    /*! \brief Sets annotation */
-    void setAnnotation(const QString& annotation);
+    const Board *getBoard() const;
 
 private:
-    /*! \brief Sets current board */
-    void setBoard(const Board& board);
-
     /** Same set of methods as above but for internal / friend class usage only,
      * to avoid stupid const_casting everywhere */
     TreeNode* next();
@@ -90,8 +78,6 @@ private:
     TreeNode* parentLine();
 
 private:
-    /*!< chess-board snapshot */
-    Board m_board;
     /*!< main line in this line */
     TreeNode* m_mainLine = nullptr;
     /*!< parent node */
@@ -100,15 +86,17 @@ private:
     TreeNode* m_parentLine = nullptr;
     /*!< all moves from this node */
     QMap<Move, TreeNode*> m_moves = {};
-    /*!< Move annotation. */
-    QString m_annotation;
+
+    Move m_parentMove;
+    mutable std::unique_ptr<Board> m_board;
 };
 
-class Tree : public QObject {
-    Q_OBJECT
+class Tree {
 public:
     /*! \brief Constructs an empty tree */
     Tree();
+
+    explicit Tree(const Board &board);
 
     /*! \brief Returns current node */
     const TreeNode* currentNode() const;
@@ -132,9 +120,6 @@ public:
     /*! \brief Sets current node to be the given node */
     void setCurrent(TreeNode* node);
 
-    /*! \brief Sets current root board. And clears the tree. */
-    void setRootBoard(const Board& board);
-
     /*! \brief Removes current node. */
     void remove(TreeNode* node);
 
@@ -146,11 +131,7 @@ public:
     /*! \brief Promotes line containing node to the main line */
     void promoteToMainline(TreeNode* node);
 
-    /*! \brief Annotates given node */
-    void annotate(TreeNode* node, const QString& annotation);
-signals:
-    /*! \brief Emited when tree is changed */
-    void changed();
+    const Board* getBoard() const { return m_current->getBoard(); }
 
 private:
     /*! \brief Root node */

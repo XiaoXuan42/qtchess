@@ -3,7 +3,7 @@
 
 #include <QWidget>
 
-#include "game/board.hpp"
+#include "game/state.hpp"
 #include "settings/settings-factory.hpp"
 
 class BoardSettings;
@@ -13,22 +13,20 @@ class BoardWidgetStateNormal;
 class PieceSet;
 
 class BoardWidget : public QWidget {
-    friend class BoardWidgetStateDragging;
-    friend class BoardWidgetStateNormal;
-
     Q_OBJECT
 public:
     explicit BoardWidget(QWidget* parent = nullptr,
                          BoardSettings& settings = SettingsFactory::board());
 
-    void setBoard(Board board);
     /* Emits move signal */
     void emitMove(Move move);
     /* Handles settings change */
     void update();
     /* Checks if given (x, y) is in some square of the board, if so,
        it initializes rank, file variables */
-    bool isFieldAt(double x, double y, int* file, int* rank);
+    bool isFieldAt(double x, double y, int* file, int* rank) const;
+    const State& getGameState() const { return *m_gameState; }
+    void setGameState(const State* pState) { m_gameState = pState; }
 
 protected:
     virtual void resizeEvent(QResizeEvent*) override;
@@ -45,6 +43,10 @@ public slots:
     void redraw();
 
 private:
+    bool isValid() const {
+        return m_gameState != nullptr && m_boardState != nullptr &&
+               m_pieceSet != nullptr;
+    }
     /* Ensures valid piece set */
     void ensureValidPieceSet();
     /* Draws board contents */
@@ -65,16 +67,14 @@ private:
     int getRankOffset(int rank) const;
     /* Helper function to determine given file offset */
     int getFileOffset(int file) const;
-    /* Sets state if passed State is not null */
-    void setState(BoardWidgetState* State);
     /* Returns absolute coordinate depending on board rotation. */
     int absolute(int coord) const;
 
 private:
     BoardSettings& m_settings;
-    BoardWidgetState* m_state;
-    Board m_board;
+    BoardWidgetState* m_boardState;
     PieceSet* m_pieceSet;
+    const State* m_gameState;
     /* Geometry properties */
     bool m_flipped;
     int m_width;  /* width of the drawing area */
@@ -83,11 +83,6 @@ private:
     /* Beginning of the chessboard squares */
     int m_firstFieldX;
     int m_firstFieldY;
-
-    Coord2D<int> m_draggedField;
-    Coord2D<int> m_dragOffset;
-    Coord2D<int> m_dragStart;
-    Coord2D<int> m_selectedField;
 };
 
 #endif  // BOARDWIDGET_HPP

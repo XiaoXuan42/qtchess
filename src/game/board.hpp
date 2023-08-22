@@ -11,7 +11,7 @@
 
 // FIXME: This enumeration is ugly as hell, move specifics should be stored
 // differently.
-enum MoveType {
+enum class MoveType {
     MOVE_NONSPECIAL,
     MOVE_CASTLE_SHORT,
     MOVE_CASTLE_LONG,
@@ -20,8 +20,7 @@ enum MoveType {
     MOVE_PROMOTION
 };
 
-// FIXME: This structure should not be public.
-struct GameState {
+struct BoardState {
     std::map<Player, bool> ShortCastlingRight;
     std::map<Player, bool> LongCastlingRight;
     bool IsCheck;
@@ -38,11 +37,13 @@ struct GameState {
 
 class Board {
 public:
-    static const GameState InitialGameState;
+    static const BoardState InitialGameState;
     static const Coord2D<int> A1, B1, C1, D1, F1, G1, H1;
     static const Coord2D<int> A8, B8, C8, D8, F8, G8, H8;
 
     Board();
+
+    const BoardState& getBoardState() const { return m_state; }
 
     /*! \brief Sets board position from fen if it is valid.
      * \returns true if fen position is valid, false otherwise
@@ -51,30 +52,6 @@ public:
 
     /*! \brief Returns FEN representation of current position */
     QString toFen() const;
-
-    /*! \brief Returns file string */
-    QString fileString(int file) const;
-
-    /*! \brief Returns rank string */
-    QString rankString(int rank) const;
-
-    /*! \brief Returns rank code */
-    int charToRank(QChar rank) const;
-
-    /*! \brief Returns rank code */
-    int charToFile(QChar file) const;
-
-    /*! \brief Returns field string */
-    QString squareString(Coord2D<int> coord) const;
-
-    /*! \brief Returns long algebraic notation of the given move */
-    QString longAlgebraicNotationString(Move move) const;
-
-    /*! \brief Returns algebraic notation string of the given move */
-    QString algebraicNotationString(Move move) const;
-
-    /*! \brief Returns move from long algebraic notation */
-    Move longAlgebraicNotationToMove(const QString& lan) const;
 
     /*! \brief Returns full move count */
     int fullMoveCount() const;
@@ -101,7 +78,7 @@ public:
      * \param retState next state (optional)
      * \param retType move type (optional)
      */
-    bool isLegal(Move move, GameState* retState = nullptr,
+    bool isLegal(Move move, BoardState* retState = nullptr,
                  MoveType* retType = nullptr) const;
 
     /*! \brief Makes the move on the board
@@ -131,6 +108,9 @@ public:
     /*! \brief Returns current player */
     Player currentPlayer() const;
 
+    bool isLegalCoord(Coord2D<int> Coord) const;
+    bool isLegalCoord(int x, int y) const;
+
 private:
     CoordsVector getPawnAttack(int x, int y, Player Owner) const;
     CoordsVector getBishopAttack(int x, int y) const;
@@ -150,14 +130,12 @@ private:
     bool isLegalRookMove(Move move) const;
     bool isLegalQueenMove(Move move) const;
     bool isLegalKingMove(Move move, bool& MoveIsCastle, MoveType& Side) const;
-    bool isLegalCoord(Coord2D<int> Coord) const;
-    bool isLegalCoord(int x, int y) const;
     bool canCastle(MoveType castleType) const;
     int countAttacksFor(Coord2D<int> coord, Player attacker) const;
     int countChecksFor(Player player) const;
 
 private:
-    GameState m_state;
+    BoardState m_state;
     mutable Position m_position;
 };
 

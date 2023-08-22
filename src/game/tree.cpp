@@ -1,15 +1,17 @@
 #include "tree.hpp"
 
 #include <QDebug>
+#include <memory>
 
-TreeNode::TreeNode(const Board& board, TreeNode* parent, TreeNode* parentLine)
-    : m_board(board), m_parent(parent), m_parentLine(parentLine) {}
+#include "game/board.hpp"
+
+TreeNode::TreeNode(TreeNode* parent, TreeNode* parentLine,
+                   const Move& parentMove)
+    : m_parent(parent), m_parentLine(parentLine), m_parentMove(parentMove) {}
 
 TreeNode::~TreeNode() {
     for (TreeNode* next : m_moves.values()) delete next;
 }
-
-const Board& TreeNode::board() const { return m_board; }
 
 const TreeNode* TreeNode::next() const { return m_mainLine; }
 
@@ -21,8 +23,6 @@ const TreeNode* TreeNode::next(Move move) const {
 const TreeNode* TreeNode::parent() const { return m_parent; }
 
 const TreeNode* TreeNode::parentLine() const { return m_parentLine; }
-
-const QString& TreeNode::annotation() const { return m_annotation; }
 
 bool TreeNode::hasNext(Move move) const { return m_moves.contains(move); }
 
@@ -78,14 +78,11 @@ bool TreeNode::isChildNode(TreeNode* node) const {
     return false;
 }
 
-void TreeNode::setBoard(const Board& board) { m_board = board; }
-
 void TreeNode::setParentLine(TreeNode* node) { m_parentLine = node; }
 
-void TreeNode::setParent(TreeNode* node) { m_parent = node; }
-
-void TreeNode::setAnnotation(const QString& annotation) {
-    m_annotation = annotation;
+void TreeNode::setParent(TreeNode* node, const Move& parentMove) {
+    m_parent = node;
+    m_parentMove = parentMove;
 }
 
 TreeNode* TreeNode::next() {
@@ -105,33 +102,55 @@ TreeNode* TreeNode::parentLine() {
         const_cast<const TreeNode*>(this)->parentLine());
 }
 
-Tree::Tree() : m_current(&m_root) {}
+const Board* TreeNode::getBoard() const {
+    std::vector<Move> moves;
+    auto* cur = this;
+    while (cur->m_board == nullptr) {
+        if (cur->m_parent == nullptr) {
+            return nullptr;
+        }
+        moves.push_back(cur->m_parentMove);
+        cur = cur->m_parent;
+    }
+    auto newBoard = std::make_unique<Board>(*cur->m_board);
+    for (auto it = moves.rbegin(); it != moves.rend(); ++it) {
+        if (!newBoard->makeMove(*it)) {
+            return nullptr;
+        }
+    }
+    m_board = std::move(newBoard);
+    return m_board.get();
+}
+
+Tree::Tree() : m_root(nullptr, nullptr, Move::NullMove), m_current(&m_root) {
+    m_root.m_board = std::make_unique<Board>();
+}
+
+Tree::Tree(const Board& board)
+    : m_root(nullptr, nullptr, Move::NullMove), m_current(&m_root) {
+    m_root.m_board = std::make_unique<Board>(board);
+}
 
 const TreeNode* Tree::rootNode() const { return &m_root; }
 
 const TreeNode* Tree::currentNode() const { return m_current; }
 
 bool Tree::addMove(Move move) {
-    if (!m_current->board().isLegal(move)) return false;
-
     if (!m_current->hasNext(move)) {
-        Board board = m_current->board();
-        board.makeMove(move);
         TreeNode* node;
 
         if (m_current->hasNeighbours())
-            node = new TreeNode(board, m_current, m_current);
+            node = new TreeNode(m_current, m_current, move);
         else
-            node = new TreeNode(board, m_current,
-                                const_cast<TreeNode*>(m_current->parentLine()));
+            node = new TreeNode(m_current,
+                                const_cast<TreeNode*>(m_current->parentLine()),
+                                move);
 
         m_current->addTransition(move, node);
         m_current = node;
     } else
         // Next move exists. Just set it as a current move.
         m_current = const_cast<TreeNode*>(m_current->next(move));
-
-    emit changed();
 
     return true;
 }
@@ -141,7 +160,6 @@ bool Tree::delMove(Move move) {
 
     delete m_current->delTransition(move);
 
-    // emit changed();
     return true;
 }
 
@@ -150,21 +168,12 @@ void Tree::clear() {
 
     for (const Move& move : m_root.nextMoves())
         delete m_root.delTransition(move);
-
-    emit changed();
 }
 
 void Tree::setCurrent(TreeNode* node) {
     Q_ASSERT(node && "Setting null node.");
 
     m_current = node;
-    emit changed();
-}
-
-void Tree::setRootBoard(const Board& board) {
-    clear();
-    m_current->setBoard(board);
-    emit changed();
 }
 
 void Tree::remove(TreeNode* node) {
@@ -188,8 +197,6 @@ void Tree::remove(TreeNode* node) {
         }
         // Restore m_current pointer
         m_current = current;
-
-        emit changed();
     }
 }
 
@@ -229,19 +236,10 @@ bool Tree::promote(TreeNode* node) {
     // to set 2... Nf6 main line to 3. b4.
     lineParent->setMainLine(firstInLine);
 
-    emit changed();
     return true;
 }
 
 void Tree::promoteToMainline(TreeNode* node) {
     while (promote(node))
         ;
-}
-
-void Tree::annotate(TreeNode* node, const QString& annotation) {
-    Q_ASSERT(node && "Annotated null node");
-
-    node->setAnnotation(annotation);
-
-    emit changed();
 }

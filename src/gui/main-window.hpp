@@ -2,7 +2,7 @@
 #define MAIN_WINDOW_HPP
 #include <QMainWindow>
 
-#include "game/tree.hpp"
+#include "game/state.hpp"
 #include "gui/settings/settings-dialog.hpp"
 
 namespace Ui {
@@ -26,9 +26,10 @@ private slots:
     void closeEvent(QCloseEvent *);
 
 private:
-    Ui::MainWindow *ui;
-    // Game tree
-    Tree m_tree;
+    void stateChanged();
+
+    Ui::MainWindow *m_ui;
+    State m_state;
     // Settings dialog
     SettingsDialog *m_settingsDialog;
 };

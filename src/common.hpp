@@ -8,8 +8,9 @@ struct Coord2D {
     T x, y;
 
     Coord2D() : x(0), y(0) {}
-
     Coord2D(T x, T y) : x(x), y(y) {}
+
+    static inline Coord2D<T> invalidPos = Coord2D<T>(-1, -1);
 
     Coord2D operator-(const Coord2D& rhs) {
         return Coord2D(x - rhs.x, y - rhs.y);

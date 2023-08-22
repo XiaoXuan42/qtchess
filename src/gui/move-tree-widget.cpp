@@ -8,12 +8,13 @@
 
 #include "settings/settings-factory.hpp"
 #include "util/html-move-tree-builder.hpp"
+#include "util/stringify.hpp"
 
 void TreeHtml::traverse(HtmlMoveTreeBuilder& builder, Move lastMove,
-                        const TreeNode* node, const Tree* tree) {
+                        Board& board, const TreeNode* node, const Tree* tree) {
+    // lastMove is not made by board
     if (lastMove != Move::NullMove) {
-        const Board& board = node->parent()->board();
-        QString notation = board.algebraicNotationString(lastMove);
+        QString notation = Stringify::algebraicNotationString(board, lastMove);
         QString number = QString::number(board.fullMoveCount());
 
         if (board.currentPlayer().isWhite())
@@ -28,29 +29,39 @@ void TreeHtml::traverse(HtmlMoveTreeBuilder& builder, Move lastMove,
         builder.addMove(notation, node->uid(),
                         node->uid() == tree->currentNode()->uid());
 
-        if (!node->annotation().isEmpty())
-            builder.addAnnotation(node->annotation());
-
         HtmlMoveTreeBuilder childBuilder;
-        for (const Move& next : node->nonMainMoves())
-            traverse(childBuilder, next, node->next(next), tree);
+        for (const Move& next : node->nonMainMoves()) {
+            Board newBoard = board;
+            // TODO: warning here for invalid move
+            newBoard.makeMove(lastMove);
+            if (newBoard.makeMove(next)) {
+                traverse(childBuilder, next, newBoard, node->next(next), tree);
+            }
+        }
 
         if (!childBuilder.isEmpty()) builder.addVariant(childBuilder.html());
     }
 
-    if (node->hasNeighbours())
-        traverse(builder, node->nextMove(), node->next(), tree);
+    if (node->hasNeighbours()) {
+        // TODO: warning here for invalid move
+        board.makeMove(lastMove);
+        traverse(builder, node->nextMove(), board, node->next(), tree);
+    }
 }
 
 QString TreeHtml::html(const Tree* tree) {
+    if (tree == nullptr) {
+        return "";
+    }
     HtmlMoveTreeBuilder builder;
-    traverse(builder, Move::NullMove, tree->rootNode(), tree);
+    Board initBoard = *tree->rootNode()->getBoard();
+    traverse(builder, Move::NullMove, initBoard, tree->rootNode(), tree);
     return builder.htmlWithStyle();
 }
 
 MoveTreeWidget::MoveTreeWidget(QWidget* parent)
     : QWebEngineView(parent),
-      m_tree(nullptr),
+      m_state(nullptr),
       m_hoveredMoveUid(0),
       m_actionMoveUid(0) {
     QObject::connect(&SettingsFactory::html(), &HtmlSettings::changed, this,
@@ -58,76 +69,11 @@ MoveTreeWidget::MoveTreeWidget(QWidget* parent)
 
     QObject::connect(page(), &QWebEnginePage::linkHovered, this,
                      &MoveTreeWidget::onMoveHovered);
-    // TODO: implement this
-    // QObject::connect(this, &QWebView::linkClicked, this,
-    // &MoveTreeWidget::onMoveClicked);
-
-    new QShortcut(QKeySequence(Qt::Key_Left), this, SLOT(onMovePrev()));
-    new QShortcut(QKeySequence(Qt::Key_Right), this, SLOT(onMoveNext()));
-}
-
-void MoveTreeWidget::setTree(Tree* tree) {
-    m_tree = tree;
-    redraw();
 }
 
 QSize MoveTreeWidget::sizeHint() const { return QSize(250, 100); }
 
-void MoveTreeWidget::contextMenuEvent(QContextMenuEvent* event) {
-    m_actionMoveUid = m_hoveredMoveUid;
-    // Don't care if no node has been hovered.
-    if (!m_actionMoveUid) return;
-
-    QMenu menu;
-    menu.addAction("Annotate", this, SLOT(onAnnotate()));
-    menu.addSeparator();
-    menu.addAction("Promote up", this, SLOT(onPromoteUp()));
-    menu.addAction("Promote to mainline", this, SLOT(onPromoteToMainline()));
-    menu.addSeparator();
-    menu.addAction("Remove", this, SLOT(onRemove()));
-    menu.addAction("Remove annotation", this, SLOT(onRemoveAnnotation()));
-    menu.exec(event->globalPos());
-
-    redraw();
-}
-
-void MoveTreeWidget::redraw() { setHtml(TreeHtml::html(m_tree)); }
-
-void MoveTreeWidget::onMovePrev() {
-    // FIXME: Ugly casts!
-    if (m_tree->currentNode()->parent())
-        m_tree->setCurrent(
-            const_cast<TreeNode*>(m_tree->currentNode()->parent()));
-}
-
-void MoveTreeWidget::onMoveNext() {
-    // FIXME: Ugly casts!
-    if (m_tree->currentNode()->next())
-        m_tree->setCurrent(
-            const_cast<TreeNode*>(m_tree->currentNode()->next()));
-}
-
-void MoveTreeWidget::onAnnotate() {
-    QString annotation = QInputDialog::getMultiLineText(
-        this, tr("Edit annotation"), tr("Text:"));
-    m_tree->annotate(TreeNode::fromUid(m_actionMoveUid), annotation);
-}
-
-void MoveTreeWidget::onRemoveAnnotation() {
-    m_tree->annotate(TreeNode::fromUid(m_actionMoveUid), QString());
-}
-
-void MoveTreeWidget::onPromoteUp() {
-    m_tree->promote(TreeNode::fromUid(m_actionMoveUid));
-}
-
-void MoveTreeWidget::onPromoteToMainline() {
-    m_tree->promoteToMainline(TreeNode::fromUid(m_actionMoveUid));
-}
-
-void MoveTreeWidget::onRemove() {
-    m_tree->remove(TreeNode::fromUid(m_actionMoveUid));
-}
+void MoveTreeWidget::redraw() { setHtml(TreeHtml::html(m_state->getTree())); }
 
 void MoveTreeWidget::onMoveClicked(const QUrl&) {
     emit moveSelected(m_hoveredMoveUid);

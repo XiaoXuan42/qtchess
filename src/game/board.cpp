@@ -5,7 +5,9 @@
 #include <cstdio>
 #include <cstdlib>
 
-const GameState Board::InitialGameState = {
+#include "util/stringify.hpp"
+
+const BoardState Board::InitialGameState = {
     .ShortCastlingRight = {{Player::white(), true}, {Player::black(), true}},
     .LongCastlingRight = {{Player::white(), true}, {Player::black(), true}},
     .IsCheck = false,
@@ -42,7 +44,7 @@ bool Board::setFen(QString fen) {
 
     // Start with empty position
     Position position = Position::emptyPosition();
-    GameState state;
+    BoardState state;
 
     // And no castling rights.
     state.LongCastlingRight[Player::white()] = false;
@@ -101,8 +103,8 @@ bool Board::setFen(QString fen) {
     if (enpassant != "-") {
         if (enpassant.length() < 2) return false;
 
-        int file = charToFile(enpassant[0]);
-        int rank = charToRank(enpassant[1]);
+        int file = Stringify::charToFile(enpassant[0]);
+        int rank = Stringify::charToRank(enpassant[1]);
 
         if (!isLegalCoord(file, rank)) return false;
 
@@ -163,8 +165,8 @@ QString Board::toFen() const {
     // Castling rights
     if (!hasShortCastlingRights(Player::white()) &&
         !hasShortCastlingRights(Player::black()) &&
-        !hasLongCastlingRights(Player::white()) &&
-        !hasLongCastlingRights(Player::black()))
+        !hasLongCastlingRights(Player::black()) &&
+        !hasLongCastlingRights(Player::white()))
         fen += " - ";
     else {
         fen += hasShortCastlingRights(Player::white()) ? "K" : "";
@@ -175,7 +177,8 @@ QString Board::toFen() const {
 
     // En passant
     if (isLegalCoord(m_state.EnPassantCoords.x, m_state.EnPassantCoords.y))
-        fen += QString(" %1 ").arg(squareString(m_state.EnPassantCoords));
+        fen += QString(" %1 ").arg(
+            Stringify::squareString(m_state.EnPassantCoords));
     else
         fen += " - ";
     // Move clocks
@@ -183,120 +186,6 @@ QString Board::toFen() const {
                                 QString::number(m_state.FullMoveCounter));
 
     return fen;
-}
-
-QString Board::fileString(int file) const { return QString(char(file + 'a')); }
-
-QString Board::rankString(int rank) const {
-    return QString(char(7 - rank + '1'));
-}
-
-int Board::charToRank(QChar rank) const { return '8' - rank.toLatin1(); }
-
-int Board::charToFile(QChar file) const { return file.toLatin1() - 'a'; }
-
-QString Board::squareString(Coord2D<int> coord) const {
-    return fileString(coord.x) + rankString(coord.y);
-}
-
-QString Board::longAlgebraicNotationString(Move move) const {
-    return squareString(move.from()) + squareString(move.to()) +
-           Piece(move.promotionPiece()).symbolString().toLower();
-}
-
-QString Board::algebraicNotationString(Move move) const {
-    Piece piece = pieceAt(move.from());
-    MoveType moveType;
-    GameState gameState;
-
-    if (!isLegal(move, &gameState, &moveType)) return "invalid move";
-
-    QString check = gameState.IsCheck ? "+" : "";
-
-    switch (moveType) {
-        case MOVE_CASTLE_SHORT:
-            return "O-O" + check;
-        case MOVE_CASTLE_LONG:
-            return "O-O-O" + check;
-        case MOVE_ENPASSANT_CAPTURE:
-            return fileString(move.from().x) + "x" + squareString(move.to()) +
-                   check;
-        case MOVE_PROMOTION:
-            return squareString(move.to()) + "=" +
-                   Piece(move.promotionPiece()).symbolString() + check;
-        default:
-            break;
-    }
-
-    // String that helps avoid move ambiguity
-    QString uniqueFrom = "";
-
-    // Now have to take care of the notational ambiguity (e.g. one of two
-    // knights on the same file jump to a position reachable for both of them)
-    if (!piece.isKing() && !piece.isPawn()) {
-        CoordsVector attackingPieces;
-        for (int rank = 0; rank < 8; ++rank) {
-            for (int file = 0; file < 8; ++file) {
-                Coord2D<int> current(file, rank);
-
-                if (current == move.from() || pieceAt(current) != piece)
-                    continue;
-                if (getAttackedCoords(piece, piece.owner(), current)
-                        .contains(move.to()))
-                    attackingPieces.push_back(current);
-            }
-        }
-        int attackersInSameRank = 0;
-        int attackersInSameFile = 0;
-
-        for (const auto& item : attackingPieces) {
-            if (item.x == move.from().x) ++attackersInSameFile;
-            if (item.y == move.from().y) ++attackersInSameRank;
-        }
-
-        if (attackersInSameRank) uniqueFrom += fileString(move.from().x);
-        if (attackersInSameFile) uniqueFrom += rankString(move.from().y);
-
-        // Same diagonal
-        if (!attackersInSameRank && !attackersInSameFile &&
-            attackingPieces.size())
-            uniqueFrom += fileString(move.from().x);
-    }
-    // Capture
-    if (!pieceAt(move.to()).isNone())
-        return (piece.isPawn() ? fileString(move.from().x)
-                               : piece.symbolString()) +
-               uniqueFrom + "x" + squareString(move.to()) + check;
-
-    // Normal move
-    return (piece.isPawn() ? "" : piece.symbolString()) + uniqueFrom +
-           squareString(move.to()) + check;
-}
-
-Move Board::longAlgebraicNotationToMove(const QString& lan) const {
-    Move move;
-
-    move.From.x = charToFile(lan.at(0));
-    move.From.y = charToRank(lan.at(1));
-    move.To.x = charToFile(lan.at(2));
-    move.To.y = charToRank(lan.at(3));
-
-    // This is a promotion
-    if (lan.length() > 4) {
-        QChar piece = lan.at(4);
-
-        if (piece == 'b')
-            move.PromotionPiece = Piece::Type::Bishop;
-        else if (piece == 'r')
-            move.PromotionPiece = Piece::Type::Rook;
-        else if (piece == 'q')
-            move.PromotionPiece = Piece::Type::Queen;
-        else
-            // Default promotion is funny.
-            move.PromotionPiece = Piece::Type::Knight;
-    }
-
-    return move;
 }
 
 int Board::fullMoveCount() const { return m_state.FullMoveCounter; }
@@ -320,8 +209,11 @@ Player Board::owner(int x, int y) const {
 }
 
 bool Board::makeMove(Move move) {
-    GameState nextState;
-    MoveType type = MOVE_NONSPECIAL;
+    if (move == move.NullMove) {
+        return true;
+    }
+    BoardState nextState;
+    MoveType type = MoveType::MOVE_NONSPECIAL;
     if (!isLegal(move, &nextState, &type)) return false;
     movePieces(move, type);
     m_state = nextState;
@@ -351,13 +243,13 @@ void Board::movePieces(Move move, MoveType type) {
     int sx = move.From.x, sy = move.From.y;
     int dx = move.To.x, dy = move.To.y;
 
-    if (type == MOVE_CASTLE_SHORT) {
+    if (type == MoveType::MOVE_CASTLE_SHORT) {
         m_position.setPieceAt(dx - 1, dy, m_position.pieceAt(dx + 1, dy));
         m_position.setPieceAt(dx + 1, dy, Piece());
-    } else if (type == MOVE_CASTLE_LONG) {
+    } else if (type == MoveType::MOVE_CASTLE_LONG) {
         m_position.setPieceAt(dx + 1, dy, m_position.pieceAt(dx - 2, dy));
         m_position.setPieceAt(dx - 2, dy, Piece());
-    } else if (type == MOVE_ENPASSANT_CAPTURE) {
+    } else if (type == MoveType::MOVE_ENPASSANT_CAPTURE) {
         int y =
             m_state.EnPassantCoords.y + (currentPlayer().isWhite() ? +1 : -1);
         int x = m_state.EnPassantCoords.x;
@@ -367,7 +259,7 @@ void Board::movePieces(Move move, MoveType type) {
     m_position.setPieceAt(dx, dy, m_position.pieceAt(sx, sy));
     m_position.setPieceAt(sx, sy, Piece());
 
-    if (type == MOVE_PROMOTION)
+    if (type == MoveType::MOVE_PROMOTION)
         m_position.setPieceAt(dx, dy,
                               Piece(move.PromotionPiece, currentPlayer()));
 }
@@ -384,10 +276,11 @@ bool Board::canCastle(MoveType castleType) const {
     Player current = currentPlayer();
     Player next = current.opponent();
 
-    if (castleType == MOVE_CASTLE_SHORT && hasShortCastlingRights(current)) {
+    if (castleType == MoveType::MOVE_CASTLE_SHORT &&
+        hasShortCastlingRights(current)) {
         for (const auto& step : shortKingWalkSquares[current])
             numKingWalkUnderAttack += countAttacksFor(step, next);
-    } else if (castleType == MOVE_CASTLE_LONG &&
+    } else if (castleType == MoveType::MOVE_CASTLE_LONG &&
                hasLongCastlingRights(current)) {
         for (const auto& step : longKingWalkSquares[current])
             numKingWalkUnderAttack += countAttacksFor(step, next);
@@ -409,8 +302,8 @@ bool Board::isInCheckAfterTheMove(Player victim, Move move,
     return numChecks > 0;
 }
 
-bool Board::isLegal(Move move, GameState* retState, MoveType* retType) const {
-    GameState NextState = m_state;
+bool Board::isLegal(Move move, BoardState* retState, MoveType* retType) const {
+    BoardState NextState = m_state;
 
     // Cannot take your own piece
     if (owner(move.To) == currentPlayer()) return false;
@@ -419,7 +312,7 @@ bool Board::isLegal(Move move, GameState* retState, MoveType* retType) const {
 
     bool legal = false;
     bool moveIsCastle = false;
-    MoveType type = MOVE_NONSPECIAL;
+    MoveType type = MoveType::MOVE_NONSPECIAL;
     Coord2D<int> enPassantCoords = {-1, -1};
 
     switch (pieceAt(move.From).type()) {
@@ -470,7 +363,7 @@ bool Board::isLegal(Move move, GameState* retState, MoveType* retType) const {
 
     // Half move clock update
     if (pieceAt(move.from()).isPawn() || owner(move.to()) != Player::none() ||
-        type == MOVE_ENPASSANT_CAPTURE)
+        type == MoveType::MOVE_ENPASSANT_CAPTURE)
         NextState.HalfMoveClock = 0;
     else
         ++NextState.HalfMoveClock;
@@ -512,7 +405,7 @@ bool Board::isLegalPawnMove(Move move, MoveType& Type,
             if (pieceAt(Neighbour[i]).isPawn() &&
                 owner(Neighbour[i]) != currentPlayer()) {
                 // Yes, we did
-                Type = MOVE_ENPASSANT_GENERATE;
+                Type = MoveType::MOVE_ENPASSANT_GENERATE;
             }
         }
         EnPassantCoords.x = move.to().x;
@@ -531,17 +424,17 @@ bool Board::isLegalPawnMove(Move move, MoveType& Type,
             // Normal capture
             if (!pieceAt(move.To).isNone() &&
                 owner(move.To) != currentPlayer()) {
-                if (Promotion) Type = MOVE_PROMOTION;
+                if (Promotion) Type = MoveType::MOVE_PROMOTION;
                 return true;
             }
             // En-passant
             else if (m_state.EnPassantPlayer == currentPlayer() &&
                      m_state.EnPassantCoords == move.To) {
-                Type = MOVE_ENPASSANT_CAPTURE;
+                Type = MoveType::MOVE_ENPASSANT_CAPTURE;
                 return true;
             }
         } else if (pieceAt(move.To).isNone() && isLegalRookMove(move)) {
-            if (Promotion) Type = MOVE_PROMOTION;
+            if (Promotion) Type = MoveType::MOVE_PROMOTION;
             return true;
         }
         return false;
@@ -575,15 +468,17 @@ bool Board::isLegalKingMove(Move move, bool& moveIsCastle,
     // Castling move
     bool legal = false;
     if (move.To == G1)
-        side = MOVE_CASTLE_SHORT,
+        side = MoveType::MOVE_CASTLE_SHORT,
         legal = hasShortCastlingRights(Player::white());
     else if (move.To == C1 && pieceAt(B1).isNone())
-        side = MOVE_CASTLE_LONG, legal = hasLongCastlingRights(Player::white());
+        side = MoveType::MOVE_CASTLE_LONG,
+        legal = hasLongCastlingRights(Player::white());
     else if (move.To == G8)
-        side = MOVE_CASTLE_SHORT,
+        side = MoveType::MOVE_CASTLE_SHORT,
         legal = hasShortCastlingRights(Player::black());
     else if (move.To == C8 && pieceAt(B8).isNone())
-        side = MOVE_CASTLE_LONG, legal = hasLongCastlingRights(Player::black());
+        side = MoveType::MOVE_CASTLE_LONG,
+        legal = hasLongCastlingRights(Player::black());
 
     // It is not enough to check if this is the right castle,
     // we need to see there is no blocking pieces on the way.

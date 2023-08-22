@@ -3,18 +3,19 @@
 #include <QInputDialog>
 #include <QMessageBox>
 
-#include "gui/promotion-dialog.hpp"
+#include "game/board.hpp"
 #include "gui/settings/engine-settings-dialog.hpp"
 #include "gui/settings/settings-dialog.hpp"
 #include "settings/settings-factory.hpp"
 #include "ui_main-window.h"
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent), ui(new Ui::MainWindow), m_settingsDialog(nullptr) {
-    ui->setupUi(this);
+    : QMainWindow(parent), m_ui(new Ui::MainWindow), m_settingsDialog(nullptr) {
+    m_ui->setupUi(this);
     setWindowTitle("QtChess");
     // Setup widgets
-    ui->GameTextWidget->setTree(&m_tree);
+    m_ui->Board->setGameState(&m_state);
+    m_ui->GameTextWidget->setState(&m_state);
 
     auto &layout = SettingsFactory::layout();
     restoreGeometry(
@@ -22,48 +23,33 @@ MainWindow::MainWindow(QWidget *parent)
     restoreState(layout.get(LayoutSettings::MAIN_WINDOW_STATE).toByteArray());
 
     // Connect board signals
-    QObject::connect(ui->Board, SIGNAL(moveMade(Move)), this,
+    QObject::connect(m_ui->Board, SIGNAL(moveMade(Move)), this,
                      SLOT(onMoveMade(Move)));
-    QObject::connect(ui->actionFlip, SIGNAL(triggered()), ui->Board,
+    QObject::connect(m_ui->actionFlip, SIGNAL(triggered()), m_ui->Board,
                      SLOT(flip()));
     // Connect action signals
-    QObject::connect(ui->actionSettings, SIGNAL(triggered()), this,
+    QObject::connect(m_ui->actionSettings, SIGNAL(triggered()), this,
                      SLOT(onSettingsShow()));
-    QObject::connect(ui->actionEngines, SIGNAL(triggered()), this,
+    QObject::connect(m_ui->actionEngines, SIGNAL(triggered()), this,
                      SLOT(onEnginesShow()));
-    QObject::connect(ui->actionReset, SIGNAL(triggered()), this,
+    QObject::connect(m_ui->actionReset, SIGNAL(triggered()), this,
                      SLOT(onBoardReset()));
-    QObject::connect(ui->actionSetFen, SIGNAL(triggered()), this,
+    QObject::connect(m_ui->actionSetFen, SIGNAL(triggered()), this,
                      SLOT(onSetFen()));
-    QObject::connect(ui->actionQuit, SIGNAL(triggered()), this, SLOT(close()));
+    QObject::connect(m_ui->actionQuit, SIGNAL(triggered()), this,
+                     SLOT(close()));
 
     // Connect text widget signals
-    QObject::connect(ui->GameTextWidget, &MoveTreeWidget::moveSelected, this,
+    QObject::connect(m_ui->GameTextWidget, &MoveTreeWidget::moveSelected, this,
                      &MainWindow::onPositionSet);
-
-    QObject::connect(&m_tree, &Tree::changed, this,
-                     &MainWindow::onPositionChanged);
-    // XXX: Watch out, this can be a potential race condition if Tree is
-    // modified by other thread.
-    QObject::connect(&m_tree, &Tree::changed, ui->GameTextWidget,
-                     &MoveTreeWidget::redraw);
 }
 
-MainWindow::~MainWindow() { delete ui; }
+MainWindow::~MainWindow() { delete m_ui; }
 
 void MainWindow::onMoveMade(Move move) {
-    MoveType moveType = MOVE_NONSPECIAL;
-    const Board &board = m_tree.currentNode()->board();
-
-    if (board.isLegal(move, nullptr, &moveType)) {
-        if (moveType == MOVE_PROMOTION) {
-            PromotionDialog dialog(this);
-            dialog.exec();
-
-            // Modify move, so that it knows about promoted piece
-            move = Move(move.from(), move.to(), dialog.selectedPieceType());
-        }
-        m_tree.addMove(move);
+    MoveType moveType = MoveType::MOVE_NONSPECIAL;
+    if (m_state.addMove(move)) {
+        onPositionChanged();
     }
 }
 
@@ -86,15 +72,14 @@ void MainWindow::onEnginesShow() {
         ->exec();
 }
 
-void MainWindow::onBoardReset() { m_tree.clear(); }
+void MainWindow::onBoardReset() { m_state.reset(); stateChanged(); }
 
 void MainWindow::onPositionChanged() {
-    ui->Board->setBoard(m_tree.currentNode()->board());
-    ui->engineWidget->setBoard(m_tree.currentNode()->board());
+    stateChanged();
 }
 
 void MainWindow::onPositionSet(size_t uid) {
-    m_tree.setCurrent(TreeNode::fromUid(uid));
+    m_state.setByTreeNode(TreeNode::fromUid(uid));
 }
 
 void MainWindow::onSetFen() {
@@ -111,7 +96,8 @@ void MainWindow::onSetFen() {
                 tr("Passed string '%1' is not a valid FEN string")
                     .arg(dialog.textValue()));
         } else {
-            m_tree.setRootBoard(board);
+            m_state.reset(board);
+            stateChanged();
             break;
         }
     }
@@ -122,4 +108,10 @@ void MainWindow::closeEvent(QCloseEvent *) {
     layout.set(LayoutSettings::MAIN_WINDOW_GEOMETRY, saveGeometry());
     layout.set(LayoutSettings::MAIN_WINDOW_STATE, saveState());
     layout.save();
+}
+
+void MainWindow::stateChanged() {
+    m_ui->Board->redraw();
+    m_ui->GameTextWidget->redraw();
+    m_ui->engineWidget->setBoard(m_state.getBoard());
 }

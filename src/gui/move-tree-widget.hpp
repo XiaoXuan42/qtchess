@@ -4,6 +4,7 @@
 #include <QWidget>
 
 #include "game/tree.hpp"
+#include "game/state.hpp"
 
 class HtmlMoveTreeBuilder;
 class TreeHtml {
@@ -12,7 +13,7 @@ public:
     static QString html(const Tree*);
 
 private:
-    static void traverse(HtmlMoveTreeBuilder& builder, Move lastMove,
+    static void traverse(HtmlMoveTreeBuilder& builder, Move lastMove, Board &board,
                          const TreeNode* node, const Tree* tree);
 };
 
@@ -22,32 +23,22 @@ public:
     explicit MoveTreeWidget(QWidget* parent = nullptr);
 
     /*! \brief Sets tree that will be rendered by this widget */
-    void setTree(Tree* tree);
+    void setState(const State *state) { m_state = state; }
 
     /*! \brief Returns satisfactory size */
     virtual QSize sizeHint() const;
 
-protected:
-    /*! \brief Displays custom context menu */
-    virtual void contextMenuEvent(QContextMenuEvent*);
 public slots:
     /*! \brief Issues redraw */
     void redraw();
 private slots:
-    void onMoveNext();
-    void onMovePrev();
     void onMoveClicked(const QUrl&);
     void onMoveHovered(const QString&);
-    void onAnnotate();
-    void onRemoveAnnotation();
-    void onPromoteUp();
-    void onPromoteToMainline();
-    void onRemove();
 signals:
     void moveSelected(size_t);
 
 private:
-    Tree* m_tree;
+    const State *m_state;
     /*!< Currently hovered node uid or 0. */
     size_t m_hoveredMoveUid;
     /*!< Uid used for action */

@@ -2,11 +2,11 @@
 
 #include <QDebug>
 
-#include "game/tree.hpp"
 #include "gui/engine/engine-selection-dialog.hpp"
 #include "settings/settings-factory.hpp"
 #include "ui_engine-widget.h"
 #include "util/html-move-tree-builder.hpp"
+#include "util/stringify.hpp"
 
 EngineWidget::EngineWidget(QWidget* parent)
     : QWidget(parent), ui(new Ui::EngineWidget) {
@@ -87,13 +87,13 @@ void EngineWidget::redraw() {
 
         for (int i = 0; i < info.moveList().size(); i++) {
             const QString& moveString = info.moveList()[i];
-            Move move = board.longAlgebraicNotationToMove(moveString);
+            Move move = Stringify::longAlgebraicNotationToMove(moveString);
 
             if (board.currentPlayer().isWhite())
                 builder.addMoveNumber(QString::number(board.fullMoveCount()) +
                                       ". ");
 
-            QString algebraicMove = board.algebraicNotationString(move);
+            QString algebraicMove = Stringify::algebraicNotationString(board, move);
             if (i == info.moveList().size() - 1 && info.mate()) {
                 algebraicMove.chop(1);
                 algebraicMove.append('#');

@@ -3,30 +3,25 @@
 #include <QPainter>
 #include <algorithm>
 
-#include "game/board.hpp"
 #include "gui/board/board-widget-state.hpp"
 #include "piece-set.hpp"
 
 static const int MinSize = 256;
 
-BoardWidget::BoardWidget(QWidget* parent, BoardSettings& settings)
+BoardWidget::BoardWidget(QWidget* parent,
+                         BoardSettings& settings)
     : QWidget(parent),
       m_settings(settings),
-      m_state(new BoardWidgetStateNormal()),
+      m_boardState(new BoardWidgetState()),
       m_pieceSet(nullptr),
-      m_flipped(false),
-      m_draggedField(-1, -1),
-      m_selectedField(-1, -1) {
+      m_gameState(nullptr),
+      m_flipped(false) {
     setMinimumSize(MinSize, MinSize);
     setMouseTracking(true);
+    ensureValidPieceSet();
 
     QObject::connect(&settings, &AbstractSettings::changed, this,
                      &BoardWidget::update);
-}
-
-void BoardWidget::setBoard(Board board) {
-    m_board = board;
-    redraw();
 }
 
 void BoardWidget::flip() {
@@ -58,7 +53,7 @@ void BoardWidget::update() {
     redraw();
 }
 
-bool BoardWidget::isFieldAt(double x, double y, int* file, int* rank) {
+bool BoardWidget::isFieldAt(double x, double y, int* file, int* rank) const {
     const int Size = 8 * m_fieldSize;
     x -= m_firstFieldX;
     y -= m_firstFieldY;
@@ -79,15 +74,21 @@ void BoardWidget::paintEvent(QPaintEvent*) {
 }
 
 void BoardWidget::mousePressEvent(QMouseEvent* Event) {
-    setState(m_state->onMousePress(this, Event));
+    if (m_boardState->onMousePress(this, Event)) {
+        redraw();
+    }
 }
 
 void BoardWidget::mouseReleaseEvent(QMouseEvent* Event) {
-    setState(m_state->onMouseRelease(this, Event));
+    if (m_boardState->onMouseRelease(this, Event)) {
+        redraw();
+    }
 }
 
 void BoardWidget::mouseMoveEvent(QMouseEvent* Event) {
-    setState(m_state->onMouseMove(this, Event));
+    if (m_boardState->onMouseMove(this, Event)) {
+        redraw();
+    }
 }
 
 void BoardWidget::ensureValidPieceSet() {
@@ -100,6 +101,7 @@ void BoardWidget::ensureValidPieceSet() {
 }
 
 void BoardWidget::draw(QPainter& context) {
+    if (!isValid()) { return; }
     drawBorder(context);
     for (int rank = 0; rank < 8; rank++) {
         for (int file = 0; file < 8; file++) {
@@ -155,15 +157,18 @@ void BoardWidget::drawBorder(QPainter& context) {
 }
 
 void BoardWidget::drawDraggedPiece(QPainter& context) {
-    if (m_draggedField == Coord2D<int>(-1, -1)) return;
+    if (m_boardState->m_mouseState != BoardWidgetState::MouseState::DRAGGING ||
+        m_boardState->m_draggedField == Coord2D<int>::invalidPos || m_gameState == nullptr)
+        return;
 
-    int FieldX = absolute(m_draggedField.x);
-    int FieldY = absolute(m_draggedField.y);
-    QRect Dest(FieldX * m_fieldSize + m_firstFieldX + m_dragOffset.x,
-               FieldY * m_fieldSize + m_firstFieldY + m_dragOffset.y,
-               m_fieldSize, m_fieldSize);
+    int FieldX = absolute(m_boardState->m_draggedField.x);
+    int FieldY = absolute(m_boardState->m_draggedField.y);
+    QRect Dest(
+        FieldX * m_fieldSize + m_firstFieldX + m_boardState->m_dragOffset.x,
+        FieldY * m_fieldSize + m_firstFieldY + m_boardState->m_dragOffset.y,
+        m_fieldSize, m_fieldSize);
 
-    Piece piece = m_board.pieceAt(m_draggedField);
+    Piece piece = m_gameState->getBoard().pieceAt(m_boardState->m_draggedField);
 
     if (piece.isNone()) return;
 
@@ -193,9 +198,10 @@ void BoardWidget::drawPiece(QPainter& context, QRectF dest, Piece piece) {
 void BoardWidget::drawPiece(QPainter& context, int rank, int file) {
     int x = absolute(file);
     int y = absolute(rank);
-    Piece Piece = m_board.pieceAt(x, y);
+    Piece Piece = m_gameState->getBoard().pieceAt(x, y);
 
-    if (Piece.isNone() || m_draggedField == Coord2D<int>(x, y)) return;
+    if (Piece.isNone() || m_boardState->m_draggedField == Coord2D<int>(x, y))
+        return;
 
     QRectF Dest(getFileOffset(file), getRankOffset(rank), m_fieldSize,
                 m_fieldSize);
@@ -203,9 +209,9 @@ void BoardWidget::drawPiece(QPainter& context, int rank, int file) {
 }
 
 void BoardWidget::drawSelection(QPainter& context) {
-    if (m_selectedField == Coord2D<int>(-1, -1)) return;
-    int file = absolute(m_selectedField.x);
-    int rank = absolute(m_selectedField.y);
+    if (m_boardState->m_selectedField == Coord2D<int>::invalidPos) return;
+    int file = absolute(m_boardState->m_selectedField.x);
+    int rank = absolute(m_boardState->m_selectedField.y);
     int size = 2 * int(double(std::min(m_width, m_height)) / MinSize);
     QBrush Brush = QBrush(QColor(0, 0, 0, 0));
     QPen Pen;
@@ -225,12 +231,6 @@ int BoardWidget::getRankOffset(int rank) const {
 
 int BoardWidget::getFileOffset(int file) const {
     return m_firstFieldX + file * m_fieldSize;
-}
-
-void BoardWidget::setState(BoardWidgetState* State) {
-    if (State == nullptr) return;
-    delete m_state;
-    m_state = State;
 }
 
 int BoardWidget::absolute(int coord) const {
