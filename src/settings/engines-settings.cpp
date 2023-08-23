@@ -59,3 +59,12 @@ EngineConfig EnginesSettings::config(const QString& name) const {
     }
     Q_ASSERT(!"No such engine exists.");
 }
+
+std::vector<EngineConfig> EnginesSettings::configs() const {
+    auto nameList = names();
+    std::vector<EngineConfig> results;
+    for (auto &name : nameList) {
+        results.push_back(config(name));
+    }
+    return results;
+}

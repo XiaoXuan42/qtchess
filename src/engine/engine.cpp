@@ -4,6 +4,8 @@
 #include <stdexcept>
 
 #include "game/board.hpp"
+#include <filesystem>
+#include <iostream>
 
 Engine::Engine(const EngineConfig& config, const int timeoutMs)
     : m_timeoutMs(timeoutMs),
@@ -18,6 +20,11 @@ Engine::Engine(const EngineConfig& config, const int timeoutMs)
 
 Engine::~Engine() {
     if (isAnalysing()) stopAnalysis();
+    m_process->close();
+    // FIXME: possible memory leak or segmentation fault
+    m_process->waitForFinished(m_timeoutMs);
+    m_process->deleteLater();
+    m_process = nullptr;
 }
 
 void Engine::start() {

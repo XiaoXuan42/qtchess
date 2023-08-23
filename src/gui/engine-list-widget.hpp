@@ -1,8 +1,12 @@
 #ifndef ENGINE_LIST_WIDGET_HPP
 #define ENGINE_LIST_WIDGET_HPP
-#include <QListWidget>
 
-class EngineListWidget : public QListWidget {
+#include <QTableWidget>
+#include <vector>
+
+#include "engine/engine-config.hpp"
+
+class EngineListWidget : public QTableWidget {
     Q_OBJECT
 public:
     explicit EngineListWidget(QWidget* parent = 0);
@@ -13,13 +17,17 @@ public:
 
     /*! \brief Tests whether there is something currently selected */
     bool selected() const;
+
 public slots:
     void update();
 private slots:
-    void onClicked(QModelIndex);
+    void onClicked(int Row, int Column);
 
 private:
-    QStringList m_engines;
+    void setUpTableBasic();
+    void appendRow(const EngineConfig &config);
+
+    std::vector<EngineConfig> m_engineConfigs;
     int m_currentId;
 };
 

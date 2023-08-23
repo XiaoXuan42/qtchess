@@ -1,5 +1,6 @@
 #include "engine-settings-dialog.hpp"
 
+#include "gui/engine-list-widget.hpp"
 #include "gui/settings/engine-edit-dialog.hpp"
 #include "settings/settings-factory.hpp"
 #include "ui_engine-settings-dialog.h"
@@ -23,14 +24,18 @@ void EngineSettingsDialog::onRemoveClicked() {
     if (!ui->list->selected()) return;
 
     SettingsFactory::engines().remove(ui->list->engineName());
+    ui->list->update();
 }
 
 void EngineSettingsDialog::onCreateClicked() {
     QScopedPointer<EngineEditDialog> dialog(
         new EngineEditDialog(EngineConfig(), this));
 
-    if (dialog->exec() == QDialog::Accepted)
+    if (dialog->exec() == QDialog::Accepted) {
         SettingsFactory::engines().saveConfig(dialog->engineConfig());
+        ui->list->update();
+        emit engineSettingsUpdate(SettingsFactory::engines().names());
+    }
 }
 
 void EngineSettingsDialog::onEditClicked() {
@@ -44,5 +49,7 @@ void EngineSettingsDialog::onEditClicked() {
         // Removing to avoid duplication.
         SettingsFactory::engines().remove(ui->list->engineName());
         SettingsFactory::engines().saveConfig(dialog->engineConfig());
+        ui->list->update();
+        emit engineSettingsUpdate(SettingsFactory::engines().names());
     }
 }

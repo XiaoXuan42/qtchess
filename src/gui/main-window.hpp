@@ -17,16 +17,17 @@ public:
 private slots:
     void onMoveMade(Move move);
     void onSettingsShow();
-    void onEnginesShow();
-    void onSettingsClose();
     void onBoardReset();
     void onPositionChanged();
     void onPositionSet(size_t);
     void onSetFen();
+    void onConfigEngine();
+    void onEngineListChanged(QStringList);
     void closeEvent(QCloseEvent *);
 
 private:
     void stateChanged();
+    void createEnginePanel(const QString &name);
 
     Ui::MainWindow *m_ui;
     State m_state;

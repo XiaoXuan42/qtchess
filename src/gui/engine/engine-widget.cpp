@@ -2,25 +2,30 @@
 
 #include <QDebug>
 
-#include "gui/engine/engine-selection-dialog.hpp"
 #include "settings/settings-factory.hpp"
 #include "ui_engine-widget.h"
 #include "util/html-move-tree-builder.hpp"
 #include "util/stringify.hpp"
 
-EngineWidget::EngineWidget(QWidget* parent)
-    : QWidget(parent), ui(new Ui::EngineWidget) {
+EngineWidget::EngineWidget(EnginePtr pEngine, const QString& engineName,
+                           QWidget* parent)
+    : m_engineName(engineName),
+      QWidget(parent),
+      ui(new Ui::EngineWidget),
+      m_engine(std::move(pEngine)) {
     ui->setupUi(this);
 
     QObject::connect(ui->analyzeButton, &QPushButton::clicked, this,
                      &EngineWidget::onAnalyzeClicked);
     QObject::connect(ui->stopButton, &QPushButton::clicked, this,
                      &EngineWidget::onStopClicked);
-    QObject::connect(ui->select, &QPushButton::clicked, this,
-                     &EngineWidget::onSelectClicked);
-    QObject::connect(&SettingsFactory::engines(), SIGNAL(changed()), this,
-                     SLOT(onEnginesChanged()));
 
+    QObject::connect(m_engine.get(), &Engine::variantParsed, this,
+                     &EngineWidget::onVariantParsed);
+
+    // Update name of the selected engine;
+    ui->name->setText(m_engineName);
+    ui->name->repaint();
     reset();
 }
 
@@ -93,7 +98,8 @@ void EngineWidget::redraw() {
                 builder.addMoveNumber(QString::number(board.fullMoveCount()) +
                                       ". ");
 
-            QString algebraicMove = Stringify::algebraicNotationString(board, move);
+            QString algebraicMove =
+                Stringify::algebraicNotationString(board, move);
             if (i == info.moveList().size() - 1 && info.mate()) {
                 algebraicMove.chop(1);
                 algebraicMove.append('#');
@@ -130,7 +136,7 @@ void EngineWidget::onVariantParsed(VariantInfo info) {
 
 void EngineWidget::onAnalyzeClicked() {
     // No engine and no engine was selected by the user.
-    if (!m_engine && !onSelectClicked()) return;
+    if (!m_engine) return;
 
     m_variants.clear();
     m_engine->startAnalysis(m_currentBoard);
@@ -141,36 +147,4 @@ void EngineWidget::onStopClicked() {
     m_engine->stopAnalysis();
 
     reset();
-}
-
-bool EngineWidget::onSelectClicked() {
-    EngineSelectionDialog dialog(this);
-    if (dialog.exec() != QDialog::Accepted) return false;
-
-    setEngine(dialog.engineName());
-
-    return true;
-}
-
-void EngineWidget::onEnginesChanged() {
-    if (!m_engine) return;
-
-    // Selected engine has been removed.
-    if (!SettingsFactory::engines().names().contains(
-            m_engine->config().name())) {
-        m_engine.reset();
-
-        ui->name->setText("");
-        ui->name->repaint();
-    }
-}
-
-void EngineWidget::setEngine(QString name) {
-    m_engine.reset(new Engine(SettingsFactory::engines().config(name)));
-    QObject::connect(m_engine.get(), &Engine::variantParsed, this,
-                     &EngineWidget::onVariantParsed);
-
-    // Update name of the selected engine;
-    ui->name->setText(name);
-    ui->name->repaint();
 }

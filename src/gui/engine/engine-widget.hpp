@@ -18,7 +18,7 @@ class Tree;
 class EngineWidget : public QWidget {
     Q_OBJECT
 public:
-    explicit EngineWidget(QWidget* parent = 0);
+    explicit EngineWidget(EnginePtr pEngine, const QString &engineName, QWidget* parent = 0);
     ~EngineWidget();
 
     /*! \brief Overriden for view compactness. */
@@ -30,15 +30,12 @@ private slots:
     void onVariantParsed(VariantInfo);
     void onAnalyzeClicked();
     void onStopClicked();
-    bool onSelectClicked();
-    void onEnginesChanged();
 public slots:
     void redraw();
     void reset();
 
 private:
-    void setEngine(QString name);
-
+    QString m_engineName;
     Ui::EngineWidget* ui;
     EnginePtr m_engine;
     Board m_currentBoard;

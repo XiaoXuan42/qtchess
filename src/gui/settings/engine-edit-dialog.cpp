@@ -1,10 +1,13 @@
 #include "engine-edit-dialog.hpp"
+#include <QtWidgets/qfiledialog.h>
 
 #include <QCheckBox>
 #include <QDebug>
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QSpinBox>
+#include <QFileDialog>
+#include <filesystem>
 
 #include "engine-edit-options-dialog.hpp"
 #include "engine/engine-config.hpp"
@@ -22,6 +25,8 @@ EngineEditDialog::EngineEditDialog(EngineConfig config, QWidget* parent)
                      SLOT(onCancelClicked()));
     QObject::connect(ui->configure, SIGNAL(clicked(bool)), this,
                      SLOT(onConfigureClicked()));
+    QObject::connect(ui->commandBtn, SIGNAL(clicked(bool)), this, SLOT(onCommandBtnClicked()));
+    QObject::connect(ui->workdirBtn, SIGNAL(clicked(bool)), this, SLOT(onWorkDirBtnClicked()));
 
     ui->name->setText(config.name());
     ui->command->setText(config.command());
@@ -78,4 +83,30 @@ bool EngineEditDialog::settingsValid() {
     }
 
     return false;
+}
+
+void EngineEditDialog::onCommandBtnClicked() {
+    QString path;
+    QString inputPath = ui->command->text();
+    if (std::filesystem::is_directory(std::filesystem::path(inputPath.toStdU16String()))) {
+        path = QFileDialog::getOpenFileName(this, tr("Open File"), inputPath);
+    } else {
+        path = QFileDialog::getOpenFileName(this, tr("Open File"));
+    }
+    if (!path.isEmpty()) {
+        ui->command->setText(path);
+    }
+}
+
+void EngineEditDialog::onWorkDirBtnClicked() {
+    QString path;
+    QString inputPath = ui->workdir->text();
+    if (std::filesystem::is_directory(std::filesystem::path(inputPath.toStdU16String()))) {
+        path = QFileDialog::getOpenFileName(this, tr("Open Directory"), inputPath);
+    } else {
+        path = QFileDialog::getExistingDirectory(this, tr("Open Directory"));
+    }
+    if (!path.isEmpty()) {
+        ui->workdir->setText(path);
+    }
 }

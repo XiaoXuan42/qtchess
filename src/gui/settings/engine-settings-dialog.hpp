@@ -11,6 +11,8 @@ class EngineSettingsDialog : public QDialog {
 public:
     explicit EngineSettingsDialog(QWidget* parent = 0);
     ~EngineSettingsDialog();
+signals:
+    void engineSettingsUpdate(QStringList);
 private slots:
     void onRemoveClicked();
     void onCreateClicked();

@@ -11,7 +11,7 @@ class Board;
 class Engine : public QObject {
     Q_OBJECT
 public:
-    enum State { Working, Stopping, Idling, Initializing };
+    enum State { Working, Stopping, Idling, Initializing, Finished };
 
     explicit Engine(const EngineConfig& config, const int timeoutMs = 2000);
     ~Engine();

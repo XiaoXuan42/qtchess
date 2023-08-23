@@ -51,3 +51,9 @@ src/piece-set.cpp
 src/piece-set.hpp
 src/settings.cpp
 src/settings.hpp
+src/util/html-move-tree-builder.cpp
+src/util/html-move-tree-builder.hpp
+src/util/stringify.cpp
+src/util/stringify.hpp
+src/util/widgets.cpp
+src/util/widgets.hpp

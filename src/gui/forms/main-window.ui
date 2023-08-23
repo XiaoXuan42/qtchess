@@ -37,7 +37,6 @@
      <string>Edit</string>
     </property>
     <addaction name="actionSettings"/>
-    <addaction name="actionEngines"/>
     <addaction name="separator"/>
     <addaction name="actionSetPgn"/>
     <addaction name="actionSetFen"/>
@@ -53,18 +52,31 @@
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
-   <widget class="QMenu" name="menutools">
+   <widget class="QMenu" name="menuView">
     <property name="title">
      <string>View</string>
     </property>
     <addaction name="actionViewPGN"/>
-    <addaction name="actionViewEngine"/>
+   </widget>
+   <widget class="QMenu" name="menuTools">
+    <property name="title">
+     <string>Tools</string>
+    </property>
+    <widget class="QMenu" name="menuEngine">
+     <property name="title">
+      <string>Engine</string>
+     </property>
+     <addaction name="actionEngineConfigs"/>
+     <addaction name="separator"/>
+    </widget>
+    <addaction name="menuEngine"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
-   <addaction name="menutools"/>
+   <addaction name="menuView"/>
+   <addaction name="menuTools"/>
   </widget>
-  <widget class="QDockWidget" name="pgnDock">
+  <widget class="QDockWidget" name="pgnPanel">
    <property name="minimumSize">
     <size>
      <width>200</width>
@@ -87,7 +99,7 @@
           <x>0</x>
           <y>0</y>
           <width>174</width>
-          <height>429</height>
+          <height>562</height>
          </rect>
         </property>
        </widget>
@@ -95,12 +107,6 @@
      </item>
     </layout>
    </widget>
-  </widget>
-  <widget class="QDockWidget" name="engineDock">
-   <attribute name="dockWidgetArea">
-    <number>2</number>
-   </attribute>
-   <widget class="EngineWidget" name="engineWidget"/>
   </widget>
   <action name="actionReset">
    <property name="text">
@@ -153,15 +159,9 @@
     <string>ViewPGN</string>
    </property>
   </action>
-  <action name="actionViewEngine">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="checked">
-    <bool>true</bool>
-   </property>
+  <action name="actionEngineConfigs">
    <property name="text">
-    <string>ViewEngine</string>
+    <string>Configs</string>
    </property>
   </action>
  </widget>
@@ -179,19 +179,13 @@
    <header>gui/board/board-widget.hpp</header>
    <container>1</container>
   </customwidget>
-  <customwidget>
-   <class>EngineWidget</class>
-   <extends>QWidget</extends>
-   <header>gui/engine/engine-widget.hpp</header>
-   <container>1</container>
-  </customwidget>
  </customwidgets>
  <resources/>
  <connections>
   <connection>
    <sender>actionViewPGN</sender>
    <signal>triggered(bool)</signal>
-   <receiver>pgnDock</receiver>
+   <receiver>pgnPanel</receiver>
    <slot>setVisible(bool)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -205,23 +199,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>actionViewEngine</sender>
-   <signal>triggered(bool)</signal>
-   <receiver>engineDock</receiver>
-   <slot>setVisible(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>841</x>
-     <y>567</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>pgnDock</sender>
+   <sender>pgnPanel</sender>
    <signal>visibilityChanged(bool)</signal>
    <receiver>actionViewPGN</receiver>
    <slot>setChecked(bool)</slot>

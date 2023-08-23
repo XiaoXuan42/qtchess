@@ -1,6 +1,7 @@
 #ifndef ENGINES_SETTINGS_HPP
 #define ENGINES_SETTINGS_HPP
 #include "settings/abstract-settings.hpp"
+#include <vector>
 
 class EngineConfig;
 
@@ -22,6 +23,8 @@ public:
 
     /*! \brief Returns config of an engine of the given name. */
     EngineConfig config(const QString& name) const;
+
+    std::vector<EngineConfig> configs() const;
 };
 
 #endif

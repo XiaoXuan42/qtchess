@@ -26,6 +26,8 @@ private slots:
     void onOkClicked();
     void onCancelClicked();
     void onConfigureClicked();
+    void onCommandBtnClicked();
+    void onWorkDirBtnClicked();
 
 private:
     bool settingsValid();
