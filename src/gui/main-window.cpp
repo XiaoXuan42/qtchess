@@ -12,8 +12,8 @@
 #include "gui/settings/engine-settings-dialog.hpp"
 #include "gui/settings/settings-dialog.hpp"
 #include "settings/settings-factory.hpp"
-#include "util/widgets.hpp"
 #include "ui_main-window.h"
+#include "util/widgets.hpp"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), m_ui(new Ui::MainWindow), m_settingsDialog(nullptr) {
@@ -113,6 +113,9 @@ void MainWindow::closeEvent(QCloseEvent *) {
 void MainWindow::stateChanged() {
     m_ui->Board->redraw();
     m_ui->GameTextWidget->redraw();
+    std::for_each(m_engineWidgets.begin(), m_engineWidgets.end(), [this](EngineWidget *p) {
+        p->setBoard(this->m_state.getBoard());
+    });
 }
 
 void MainWindow::onConfigEngine() {
@@ -158,9 +161,12 @@ void MainWindow::createEnginePanel(const QString &name) {
     auto *enginePanel = new EngineWidget(std::move(pEngine), name, this);
     dock->setWidget(enginePanel);
     this->addDockWidget(Qt::RightDockWidgetArea, dock);
-    QObject::connect(dock, &CloseDockWidget::closed, [dock, enginePanel]() {
-        enginePanel->deleteLater();
-        dock->deleteLater();
-    });
+    this->m_engineWidgets.insert(enginePanel);
+    QObject::connect(dock, &CloseDockWidget::closed,
+                     [dock, enginePanel, this]() {
+                         enginePanel->deleteLater();
+                         dock->deleteLater();
+                         this->m_engineWidgets.erase(enginePanel);
+                     });
     dock->show();
 }

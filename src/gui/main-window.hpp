@@ -1,8 +1,10 @@
 #ifndef MAIN_WINDOW_HPP
 #define MAIN_WINDOW_HPP
 #include <QMainWindow>
+#include <set>
 
 #include "game/state.hpp"
+#include "gui/engine/engine-widget.hpp"
 #include "gui/settings/settings-dialog.hpp"
 
 namespace Ui {
@@ -33,6 +35,7 @@ private:
     State m_state;
     // Settings dialog
     SettingsDialog *m_settingsDialog;
+    std::set<EngineWidget *> m_engineWidgets;
 };
 
 #endif  // MAIN_WINDOW_HPP
