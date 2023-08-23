@@ -24,6 +24,9 @@ public:
     /*! \brief Returns parent node */
     const TreeNode* parent() const;
 
+    /*! \brief Returns root node */
+    const TreeNode* root() const;
+
     /*! \brief Returns parent line node */
     const TreeNode* parentLine() const;
 

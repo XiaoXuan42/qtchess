@@ -80,6 +80,7 @@ void MainWindow::onPositionChanged() { stateChanged(); }
 
 void MainWindow::onPositionSet(size_t uid) {
     m_state.setByTreeNode(TreeNode::fromUid(uid));
+    stateChanged();
 }
 
 void MainWindow::onSetFen() {

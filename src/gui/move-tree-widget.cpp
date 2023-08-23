@@ -10,6 +10,7 @@
 #include "util/html-move-tree-builder.hpp"
 #include "util/stringify.hpp"
 
+
 void TreeHtml::traverse(HtmlMoveTreeBuilder& builder, Move lastMove,
                         Board& board, const TreeNode* node, const Tree* tree) {
     // lastMove is not made by board
@@ -64,24 +65,18 @@ MoveTreeWidget::MoveTreeWidget(QWidget* parent)
       m_state(nullptr),
       m_hoveredMoveUid(0),
       m_actionMoveUid(0) {
+    auto* clickPage = new MoveTreeWebPage(this);
+    setPage(clickPage);
     QObject::connect(&SettingsFactory::html(), &HtmlSettings::changed, this,
                      &MoveTreeWidget::redraw);
-
-    QObject::connect(page(), &QWebEnginePage::linkHovered, this,
-                     &MoveTreeWidget::onMoveHovered);
+    QObject::connect(clickPage, &MoveTreeWebPage::clicked, this,
+                     &MoveTreeWidget::onMoveClicked);
 }
 
 QSize MoveTreeWidget::sizeHint() const { return QSize(250, 100); }
 
 void MoveTreeWidget::redraw() { setHtml(TreeHtml::html(m_state->getTree())); }
 
-void MoveTreeWidget::onMoveClicked(const QUrl&) {
-    emit moveSelected(m_hoveredMoveUid);
-}
-
-void MoveTreeWidget::onMoveHovered(const QString& url) {
-    if (url.isEmpty())
-        m_hoveredMoveUid = 0;
-    else
-        m_hoveredMoveUid = url.toULongLong();
+void MoveTreeWidget::onMoveClicked(size_t uid) {
+    emit moveSelected(uid);
 }

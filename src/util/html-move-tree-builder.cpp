@@ -63,7 +63,7 @@ HtmlMoveTreeBuilder& HtmlMoveTreeBuilder::addMove(const QString& move,
     else
         moveFormatted = move;
 
-    m_html.append(QString("<a class='TreeMove' href='%1'>%2</a> ")
+    m_html.append(QString("<a class='TreeMove' href='uid://%1'>%2</a> ")
                       .arg(QString::number(uid), moveFormatted));
     return *this;
 }

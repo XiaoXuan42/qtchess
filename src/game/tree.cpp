@@ -22,6 +22,14 @@ const TreeNode* TreeNode::next(Move move) const {
 
 const TreeNode* TreeNode::parent() const { return m_parent; }
 
+const TreeNode* TreeNode::root() const {
+    const TreeNode *cur = this;
+    while (cur->parent()) {
+        cur = cur->parent();
+    }
+    return cur;
+}
+
 const TreeNode* TreeNode::parentLine() const { return m_parentLine; }
 
 bool TreeNode::hasNext(Move move) const { return m_moves.contains(move); }

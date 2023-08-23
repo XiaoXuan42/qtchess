@@ -1,6 +1,8 @@
 #ifndef UTIL_WIDGETS_HPP
 #define UTIL_WIDGETS_HPP
 
+#include <QtCore/qtmetamacros.h>
+#include <QtWebEngineCore/qwebenginepage.h>
 #include <QDockWidget>
 
 class CloseDockWidget : public QDockWidget {

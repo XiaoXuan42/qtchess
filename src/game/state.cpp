@@ -21,6 +21,9 @@ bool State::addMove(const Move &move) {
 
 void State::setByTreeNode(TreeNode *node) {
     // NOTE: assert current tree owns this node
+    if (node->root() != m_pTree->rootNode()) {
+        return;
+    }
     m_pTree->setCurrent(node);
     m_board = *(m_pTree->getBoard());
 }
